@@ -160,6 +160,8 @@ def glyph_data_for_unicode(decimal_unicode):
     is_capital = "CAPITAL" in parts
 
     # Detect script suffix (check multi-word scripts first, then single-word)
+    # IMPORTANT: Only match scripts at the BEGINNING of the name to avoid
+    # ambiguity (e.g., "CHEROKEE LETTER YI" should match CHEROKEE, not YI)
     script_suffix = ""
     script_words_to_remove = []
 
@@ -170,21 +172,11 @@ def glyph_data_for_unicode(decimal_unicode):
 
     for script, suffix in sorted_scripts:
         script_parts = script.split()
-        # Check if all words of the script name appear consecutively in parts
-        if len(script_parts) == 1:
-            # Single-word script
-            if script in parts:
+        # Check if the script name appears at the START of parts
+        if len(script_parts) <= len(parts):
+            if parts[: len(script_parts)] == script_parts:
                 script_suffix = suffix
-                script_words_to_remove = [script]
-                break
-        else:
-            # Multi-word script - check for consecutive match
-            for i in range(len(parts) - len(script_parts) + 1):
-                if parts[i : i + len(script_parts)] == script_parts:
-                    script_suffix = suffix
-                    script_words_to_remove = script_parts
-                    break
-            if script_suffix:
+                script_words_to_remove = script_parts
                 break
 
     # Remove script name words from parts
@@ -193,8 +185,112 @@ def glyph_data_for_unicode(decimal_unicode):
         for word in script_words_to_remove:
             parts = [p for p in parts if p != word]
 
-    # Remove category words
-    parts = [p for p in parts if p not in DROP_CATEGORIES]
+    # Track special variants before removing descriptors
+    # These help disambiguate otherwise identical names
+    is_small_variant = "SMALL" in parts and not script_suffix
+    is_symbol_for = "SYMBOL" in parts and "FOR" in parts
+    is_punctuation_variant = "PUNCTUATION" in parts and not script_suffix
+    is_small_capital = "SMALL" in parts and "CAPITAL" in parts
+    is_symbol_variant = "SYMBOL" in parts and script_suffix  # Greek symbols
+    is_accent_variant = "ACCENT" in parts and script_suffix  # Hebrew accents
+    is_punctuation_script_variant = "PUNCTUATION" in parts and script_suffix
+    # SMALL is only a variant for scripts when LETTER/LIGATURE is NOT present
+    # (e.g., "ARABIC SMALL FATHA" vs "ARABIC FATHA")
+    # but NOT for "LATIN SMALL LETTER A" or "LATIN SMALL LIGATURE OE"
+    is_small_script_variant = (
+        "SMALL" in parts
+        and script_suffix
+        and "CAPITAL" not in parts
+        and "LETTER" not in parts
+        and "LIGATURE" not in parts
+    )
+    # Keep category words that disambiguate
+    has_radical = "RADICAL" in parts
+    has_number = "NUMBER" in parts
+    has_digit = "DIGIT" in parts
+    has_ideograph = "IDEOGRAPH" in parts
+    has_syllable = "SYLLABLE" in parts or "SYLLABICS" in parts
+
+    # Remove category words (but keep some for disambiguation)
+    parts_to_keep = set()
+    if is_small_variant or is_small_capital or is_small_script_variant:
+        parts_to_keep.add("SMALL")
+    if is_symbol_for or is_symbol_variant:
+        parts_to_keep.add("SYMBOL")
+    # For non-script symbols, keep SYMBOL if it helps disambiguate
+    if not script_suffix and "SYMBOL" in parts:
+        parts_to_keep.add("SYMBOL")
+    if is_punctuation_variant or is_punctuation_script_variant:
+        parts_to_keep.add("PUNCTUATION")
+    if is_accent_variant:
+        parts_to_keep.add("ACCENT")
+    # Keep category words that disambiguate
+    if has_radical:
+        parts_to_keep.add("RADICAL")
+    if has_number:
+        parts_to_keep.add("NUMBER")
+    if has_digit:
+        parts_to_keep.add("DIGIT")
+    if has_ideograph:
+        parts_to_keep.add("IDEOGRAPH")
+    if has_syllable:
+        parts_to_keep.add("SYLLABLE")
+        parts_to_keep.add("SYLLABICS")  # Canadian syllabics
+    # Keep MARK, LETTER, SIGN when they disambiguate
+    if "MARK" in parts and "LETTER" not in parts:
+        parts_to_keep.add("MARK")
+    if script_suffix:  # For script characters
+        if "VOWEL" in parts:
+            parts_to_keep.add("SIGN")  # VOWEL vs VOWEL SIGN
+        # Keep LETTER for letters without case indicators
+        # BUT only for scripts that have a case system
+        # e.g., "LATIN LETTER GLOTTAL STOP" vs "LATIN SMALL LETTER..."
+        # Scripts with case: Latin, Greek, Cyrillic, Georgian, Cherokee, Limbu, Phags-pa
+        scripts_with_case = {
+            "-lat",
+            "-gr",
+            "-cyr",
+            "-geo",
+            "-glag",
+            "-cop",
+            "-arm",
+            "-chr",
+            "-limb",
+            "-phag",
+        }
+        has_case_indicator = "SMALL" in parts or "CAPITAL" in parts
+
+        # For Hiragana/Katakana, SMALL is part of letter name, not case
+        # So treat as if it has case indicator (to avoid keeping LETTER)
+        if script_suffix in {"-hira", "-kata"}:
+            has_case_indicator = True
+
+        if (
+            "LETTER" in parts
+            and not has_case_indicator
+            and script_suffix in scripts_with_case
+        ):
+            parts_to_keep.add("LETTER")
+        # Keep SIGN for specific scripts
+        scripts_with_sign = {"-tai"}  # TAI YO: LETTER vs SIGN
+        if "SIGN" in parts and script_suffix in scripts_with_sign:
+            parts_to_keep.add("SIGN")
+        if "MARK" in parts and ("LETTER" in name or "SIGN" in name):
+            # e.g., SAMARITAN MARK IN vs SAMARITAN LETTER IN
+            parts_to_keep.add("MARK")
+            if (
+                "LETTER" in parts
+                and not has_case_indicator
+                and script_suffix in scripts_with_case
+            ):
+                parts_to_keep.add("LETTER")
+    else:
+        # For non-script items, keep SIGN to disambiguate
+        # e.g., "COLON" vs "COLON SIGN"
+        if "SIGN" in parts:
+            parts_to_keep.add("SIGN")
+
+    parts = [p for p in parts if p not in DROP_CATEGORIES or p in parts_to_keep]
 
     # Special handling for Hangul position indicators
     # Keep track if it's initial/medial/final before removing
@@ -209,17 +305,39 @@ def glyph_data_for_unicode(decimal_unicode):
         # Remove the position words after saving them
         parts = [p for p in parts if p not in {"CHOSEONG", "JUNGSEONG", "JONGSEONG"}]
 
-    # Remove case indicator words
-    parts = [p for p in parts if p not in CASE_INDICATORS]
+    # Remove case indicator words (but keep SMALL/CAPITAL for variant detection)
+    case_indicators_to_remove = CASE_INDICATORS.copy()
+    if is_small_variant or is_small_capital or is_small_script_variant:
+        case_indicators_to_remove.discard("SMALL")
+    # For small capitals, keep both SMALL and CAPITAL for disambiguation
+    if is_small_capital:
+        case_indicators_to_remove.discard("CAPITAL")
+    # For Hiragana/Katakana, SMALL is part of the letter identity, not case
+    if script_suffix in {"-hira", "-kata"}:
+        case_indicators_to_remove.discard("SMALL")
+    parts = [p for p in parts if p not in case_indicators_to_remove]
 
-    # Remove "WITH" and similar connecting words
-    connecting_words = {"WITH", "AND", "OR", "FOR", "TO", "OF", "THE"}
-    parts = [p for p in parts if p not in connecting_words]
+    # Remove "WITH" and similar connecting words (but keep FOR in SYMBOL FOR)
+    # Don't remove TO/THE/OF when they're the main content (e.g., syllable names)
+    # Only remove them if there are other content words left
+    connecting_words_tentative = {"WITH", "OF"}
+    if not is_symbol_for:
+        connecting_words_tentative.add("FOR")
+    # Don't remove TO/THE for syllables - they're the syllable value
+    if not has_syllable:
+        connecting_words_tentative.update({"TO", "THE"})
+    # Count how many non-connecting content words we have
+    content_words = [p for p in parts if p not in connecting_words_tentative]
+    if len(content_words) > 0:
+        # We have other content, safe to remove connecting words
+        parts = [p for p in parts if p not in connecting_words_tentative]
+    # Otherwise keep TO/THE/OF as they're the actual content
+    # Keep AND/OR for logical operators - they're essential
 
     # Handle special multi-part name formats AFTER filtering
     # For Runic: handle hyphenated compounds and multi-part names
     if script_suffix == "-run":
-        # Split hyphenated parts like "LONG-BRANCH-OSS"
+        # Split hyphenated parts like "LONG-BRANCH-OSS" or "DOTTED-N"
         expanded_parts = []
         for part in parts:
             if "-" in part:
@@ -229,11 +347,30 @@ def glyph_data_for_unicode(decimal_unicode):
                 expanded_parts.append(part)
         parts = expanded_parts
 
-        # Remove single-letter transcriptions (not unique)
-        # but keep if it's the only part
-        multi_letter_parts = [p for p in parts if len(p) > 1]
-        if multi_letter_parts:
-            parts = multi_letter_parts
+        # For runic letters, filter single-letter transcription variants
+        # "FEHU FEOH FE F" -> keep "FEHU", "FEOH", "FE", drop "F"
+        # "OS O" -> keep "OS", drop "O"
+        # "DOTTED-N" -> keep "DOTTED", "N" (both meaningful, not variants)
+        # "V" -> keep "V" (only one part)
+
+        # If we have 2+ parts and at least one is multi-letter (2+ chars),
+        # check if they look like transcription variants
+        if len(parts) >= 2:
+            multi_letter_parts = [p for p in parts if len(p) > 1]
+            single_letter_parts = [p for p in parts if len(p) == 1]
+
+            # If ALL multi-letter parts look like transcriptions
+            # (not descriptors like DOTTED, LONG, BRANCH)
+            # then drop single letters
+            descriptors = {"DOTTED", "LONG", "BRANCH", "SHORT", "GOLDEN"}
+            non_descriptor_multi = [
+                p for p in multi_letter_parts if p not in descriptors
+            ]
+
+            if non_descriptor_multi and single_letter_parts:
+                # We have transcription variants, keep multi-letter only
+                parts = multi_letter_parts
+        # Otherwise keep all parts
 
     # Special handling for Latin combining marks
     # For Latin script: "COMBINING GRAVE ACCENT" -> "gravecombining"

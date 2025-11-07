@@ -124,11 +124,11 @@ TEST_CASES = [
     (0x11A8, "kiyeokJong-ko", "HANGUL JONGSEONG KIYEOK"),
     (0x3131, "kiyeok-ko", "HANGUL LETTER KIYEOK"),
     # East Asian scripts - Hiragana
-    (0x3041, "a-hira", "HIRAGANA LETTER SMALL A"),
+    (0x3041, "smallA-hira", "HIRAGANA LETTER SMALL A"),
     (0x3042, "a-hira", "HIRAGANA LETTER A"),
     (0x3044, "i-hira", "HIRAGANA LETTER I"),
     # East Asian scripts - Katakana
-    (0x30A1, "a-kata", "KATAKANA LETTER SMALL A"),
+    (0x30A1, "smallA-kata", "KATAKANA LETTER SMALL A"),
     (0x30A2, "a-kata", "KATAKANA LETTER A"),
     (0x30A4, "i-kata", "KATAKANA LETTER I"),
     # East Asian scripts - Bopomofo
@@ -136,17 +136,17 @@ TEST_CASES = [
     (0x3106, "p-bop", "BOPOMOFO LETTER P"),
     (0x3107, "m-bop", "BOPOMOFO LETTER M"),
     # East Asian scripts - Yi
-    (0xA000, "it-yi", "YI SYLLABLE IT"),
-    (0xA001, "ix-yi", "YI SYLLABLE IX"),
-    (0xA002, "i-yi", "YI SYLLABLE I"),
+    (0xA000, "syllableIt-yi", "YI SYLLABLE IT"),
+    (0xA001, "syllableIx-yi", "YI SYLLABLE IX"),
+    (0xA002, "syllableI-yi", "YI SYLLABLE I"),
     # African scripts - Ethiopic
-    (0x1200, "ha-eth", "ETHIOPIC SYLLABLE HA"),
-    (0x1201, "hu-eth", "ETHIOPIC SYLLABLE HU"),
-    (0x1202, "hi-eth", "ETHIOPIC SYLLABLE HI"),
+    (0x1200, "syllableHa-eth", "ETHIOPIC SYLLABLE HA"),
+    (0x1201, "syllableHu-eth", "ETHIOPIC SYLLABLE HU"),
+    (0x1202, "syllableHi-eth", "ETHIOPIC SYLLABLE HI"),
     # African scripts - Vai
-    (0xA500, "ee-vai", "VAI SYLLABLE EE"),
-    (0xA501, "een-vai", "VAI SYLLABLE EEN"),
-    (0xA502, "hee-vai", "VAI SYLLABLE HEE"),
+    (0xA500, "syllableEe-vai", "VAI SYLLABLE EE"),
+    (0xA501, "syllableEen-vai", "VAI SYLLABLE EEN"),
+    (0xA502, "syllableHee-vai", "VAI SYLLABLE HEE"),
     # African scripts - Bamum
     (0xA6A0, "a-bam", "BAMUM LETTER A"),
     (0xA6A1, "ka-bam", "BAMUM LETTER KA"),
@@ -156,13 +156,13 @@ TEST_CASES = [
     (0x07CB, "ee-nko", "NKO LETTER EE"),
     (0x07CC, "i-nko", "NKO LETTER I"),
     # American scripts - Cherokee
-    (0x13A0, "a-chr", "CHEROKEE LETTER A"),
-    (0x13A1, "e-chr", "CHEROKEE LETTER E"),
-    (0x13A2, "i-chr", "CHEROKEE LETTER I"),
+    (0x13A0, "letterA-chr", "CHEROKEE LETTER A"),
+    (0x13A1, "letterE-chr", "CHEROKEE LETTER E"),
+    (0x13A2, "letterI-chr", "CHEROKEE LETTER I"),
     # Historical scripts - Georgian
     (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
     (0x10A1, "Ban-geo", "GEORGIAN CAPITAL LETTER BAN"),
-    (0x10D0, "an-geo", "GEORGIAN LETTER AN"),
+    (0x10D0, "letterAn-geo", "GEORGIAN LETTER AN"),
     # Historical scripts - Glagolitic
     (0x2C00, "Azu-glag", "GLAGOLITIC CAPITAL LETTER AZU"),
     (0x2C01, "Buky-glag", "GLAGOLITIC CAPITAL LETTER BUKY"),
@@ -221,13 +221,87 @@ TEST_CASES = [
     (0x0902, "anusvara-dev", "DEVANAGARI SIGN ANUSVARA"),
     (0x0903, "visarga-dev", "DEVANAGARI SIGN VISARGA"),
     # Symbols (no script)
-    (0x0024, "dollar", "DOLLAR SIGN"),
-    (0x0025, "percent", "PERCENT SIGN"),
+    (0x0024, "dollarSign", "DOLLAR SIGN"),
+    (0x0025, "percentSign", "PERCENT SIGN"),
     (0x0026, "ampersand", "AMPERSAND"),
     (0x002A, "asterisk", "ASTERISK"),
-    (0x002B, "plus", "PLUS SIGN"),
-    (0x003D, "equals", "EQUALS SIGN"),
+    (0x002B, "plusSign", "PLUS SIGN"),
+    (0x003D, "equalsSign", "EQUALS SIGN"),
     (0x0040, "commercialAt", "COMMERCIAL AT"),
+    # Recently fixed duplicates - Runic DOTTED variants
+    (0x16C0, "dottedN-run", "RUNIC LETTER DOTTED-N"),
+    (0x16D4, "dottedP-run", "RUNIC LETTER DOTTED-P"),
+    (0x16DB, "dottedL-run", "RUNIC LETTER DOTTED-L"),
+    # Recently fixed duplicates - Small Capital I variants
+    (0x026A, "SmallCapitalI-lat", "LATIN LETTER SMALL CAPITAL I"),
+    (0xA7AE, "CapitalSmallCapitalI-lat", "LATIN CAPITAL LETTER SMALL CAPITAL I"),
+    # Recently fixed duplicates - Ethiopic syllable TO/THE
+    (0x1276, "syllableTo-eth", "ETHIOPIC SYLLABLE TO"),
+    (0x1325, "syllableThe-eth", "ETHIOPIC SYLLABLE THE"),
+    # Recently fixed duplicates - Canadian SYLLABICS
+    (0x1450, "syllabicsTo-can", "CANADIAN SYLLABICS TO"),
+    (0x155E, "syllabicsThe-can", "CANADIAN SYLLABICS THE"),
+    # Recently fixed duplicates - TAI YO LETTER vs SIGN
+    (0x1E6E2, "yoUe-tai", "TAI YO LETTER UE"),
+    (0x1E6E3, "yoSignUe-tai", "TAI YO SIGN UE"),
+    # Recently fixed duplicates - Greek SYMBOL variants
+    (0x03D0, "betaSymbol-gr", "GREEK BETA SYMBOL"),
+    (0x03D1, "thetaSymbol-gr", "GREEK THETA SYMBOL"),
+    (0x03D5, "phiSymbol-gr", "GREEK PHI SYMBOL"),
+    (0x03D6, "piSymbol-gr", "GREEK PI SYMBOL"),
+    # Recently fixed duplicates - Hebrew ACCENT vs PUNCTUATION
+    (0x059C, "accentGeresh-heb", "HEBREW ACCENT GERESH"),
+    (0x05F3, "punctuationGeresh-heb", "HEBREW PUNCTUATION GERESH"),
+    (0x059D, "accentGereshMuqdam-heb", "HEBREW ACCENT GERESH MUQDAM"),
+    (0x05F4, "punctuationGershayim-heb", "HEBREW PUNCTUATION GERSHAYIM"),
+    # Recently fixed duplicates - Arabic SMALL variants
+    (0x0618, "smallFatha-ar", "ARABIC SMALL FATHA"),
+    (0x0619, "smallDamma-ar", "ARABIC SMALL DAMMA"),
+    # Recently fixed duplicates - Yi SYLLABLE vs RADICAL
+    (0xA490, "radicalQot-yi", "YI RADICAL QOT"),
+    # Recently fixed duplicates - Brahmi NUMBER vs DIGIT
+    (0x11052, "numberOne-brah", "BRAHMI NUMBER ONE"),
+    (0x11066, "digitZero-brah", "BRAHMI DIGIT ZERO"),
+    # Recently fixed duplicates - Logical operators (kept AND/OR)
+    (0x2A53, "doubleLogicalAnd", "DOUBLE LOGICAL AND"),
+    (0x2A54, "doubleLogicalOr", "DOUBLE LOGICAL OR"),
+    # Recently fixed duplicates - Parenthesized variants
+    (0x2474, "parenthesizedDigitOne", "PARENTHESIZED DIGIT ONE"),
+    (0x3220, "parenthesizedIdeographOne", "PARENTHESIZED IDEOGRAPH ONE"),
+    # Recently fixed duplicates - Case-aware LETTER preservation
+    # Latin: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    (0x0242, "glottalStop-lat", "LATIN SMALL LETTER GLOTTAL STOP"),
+    (0x0294, "letterGlottalStop-lat", "LATIN LETTER GLOTTAL STOP"),
+    # Greek: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    (0x03D9, "archaicKoppa-gr", "GREEK SMALL LETTER ARCHAIC KOPPA"),
+    (0x03D8, "letterArchaicKoppa-gr", "GREEK LETTER ARCHAIC KOPPA"),
+    # Georgian: LETTER vs CAPITAL/SMALL (caseless variants keep LETTER)
+    (0x2D00, "an-geo", "GEORGIAN SMALL LETTER AN"),
+    (0x10D0, "letterAn-geo", "GEORGIAN LETTER AN"),
+    (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
+    # Cherokee: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    (0xAB70, "a-chr", "CHEROKEE SMALL LETTER A"),
+    (0x13A0, "letterA-chr", "CHEROKEE LETTER A"),
+    (0x13F9, "yi-chr", "CHEROKEE SMALL LETTER YI"),
+    (0x13F1, "letterYi-chr", "CHEROKEE LETTER YI"),
+    # Limbu: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    (0x1930, "ka-limb", "LIMBU SMALL LETTER KA"),
+    (0x1901, "letterKa-limb", "LIMBU LETTER KA"),
+    (0x1931, "nga-limb", "LIMBU SMALL LETTER NGA"),
+    (0x1905, "letterNga-limb", "LIMBU LETTER NGA"),
+    # Phags-pa: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    (0xA856, "a-phag", "PHAGS-PA LETTER SMALL A"),
+    (0xA85D, "letterA-phag", "PHAGS-PA LETTER A"),
+    # Hiragana/Katakana: SMALL is size variant, not case (keep SMALL)
+    (0x3041, "smallA-hira", "HIRAGANA LETTER SMALL A"),
+    (0x3042, "a-hira", "HIRAGANA LETTER A"),
+    (0x3043, "smallI-hira", "HIRAGANA LETTER SMALL I"),
+    (0x3044, "i-hira", "HIRAGANA LETTER I"),
+    (0x30A1, "smallA-kata", "KATAKANA LETTER SMALL A"),
+    (0x30A2, "a-kata", "KATAKANA LETTER A"),
+    # Non-script SIGN preservation (COLON vs COLON SIGN, etc.)
+    (0x003A, "colon", "COLON"),
+    (0x20A1, "colonSign", "COLON SIGN"),
 ]
 
 
