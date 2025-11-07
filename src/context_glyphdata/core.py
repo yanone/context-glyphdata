@@ -12,19 +12,19 @@ SCRIPT_SUFFIXES = {
     "LATIN": "-lat",
     "GREEK": "-gr",
     "CYRILLIC": "-cyr",
-    "HEBREW": "-he",
+    "HEBREW": "-heb",
     "ARMENIAN": "-arm",
     # Indic scripts
     "DEVANAGARI": "-dev",
-    "BENGALI": "-bn",
-    "GURMUKHI": "-gu",
-    "GUJARATI": "-gj",
-    "ORIYA": "-or",
-    "TAMIL": "-ta",
-    "TELUGU": "-te",
-    "KANNADA": "-kn",
-    "MALAYALAM": "-ml",
-    "SINHALA": "-si",
+    "BENGALI": "-ben",
+    "GURMUKHI": "-gur",
+    "GUJARATI": "-guj",
+    "ORIYA": "-ori",
+    "TAMIL": "-tam",
+    "TELUGU": "-tel",
+    "KANNADA": "-kan",
+    "MALAYALAM": "-mal",
+    "SINHALA": "-sin",
     "GRANTHA": "-gran",
     "BRAHMI": "-brah",
     "KAITHI": "-kthi",
@@ -33,14 +33,14 @@ SCRIPT_SUFFIXES = {
     "KHUDAWADI": "-sind",
     # Southeast Asian scripts
     "THAI": "-th",
-    "LAO": "-lo",
-    "MYANMAR": "-my",
-    "KHMER": "-km",
+    "LAO": "-lao",
+    "MYANMAR": "-mya",
+    "KHMER": "-khm",
     "JAVANESE": "-java",
     "BALINESE": "-bali",
     "CHAM": "-cham",
     # Tibetan & Himalayan
-    "TIBETAN": "-ti",
+    "TIBETAN": "-tib",
     "LEPCHA": "-lepc",
     "LIMBU": "-limb",
     # East Asian scripts
@@ -48,10 +48,10 @@ SCRIPT_SUFFIXES = {
     "HANGUL": "-ko",
     "HIRAGANA": "-hira",
     "KATAKANA": "-kata",
-    "BOPOMOFO": "-bo",
+    "BOPOMOFO": "-bop",
     "YI": "-yi",
     # African scripts
-    "ETHIOPIC": "-et",
+    "ETHIOPIC": "-eth",
     "VAI": "-vai",
     "BAMUM": "-bam",
     "ADLAM": "-adlm",
@@ -60,19 +60,18 @@ SCRIPT_SUFFIXES = {
     "OSMANYA": "-osma",
     # American scripts
     "CHEROKEE": "-chr",
-    "CANADIAN": "-ca",
+    "CANADIAN": "-can",
     "DESERET": "-dsrt",
     "OSAGE": "-osge",
     # Central Asian scripts
-    "MONGOLIAN": "-mn",
-    "TIBETAN": "-ti",
+    "MONGOLIAN": "-mon",
     "PHAGS-PA": "-phag",
     # Historical scripts
     "GEORGIAN": "-geo",
     "GLAGOLITIC": "-glag",
     "COPTIC": "-cop",
-    "OGHAM": "-og",
-    "RUNIC": "-ru",
+    "OGHAM": "-ogh",
+    "RUNIC": "-run",
     "GOTHIC": "-goth",
     # Ancient scripts
     "CUNEIFORM": "-xsux",
@@ -82,7 +81,6 @@ SCRIPT_SUFFIXES = {
     "CYPRIOT": "-cprt",
     "PHOENICIAN": "-phnx",
     "ARAMAIC": "-arc",
-    "HEBREW": "-he",
     "AVESTAN": "-avst",
     "UGARITIC": "-ugar",
     # Other scripts
@@ -208,7 +206,7 @@ def glyph_data_for_unicode(decimal_unicode):
 
     # For Runic multi-part names like "FEHU FEOH FE F" -> keep shortest
     # These have multiple space-separated uppercase single-letter variants
-    if script_suffix == "-ru" and len(parts) > 1:
+    if script_suffix == "-run" and len(parts) > 1:
         # Find the shortest uppercase single-letter part
         single_letters = [p for p in parts if len(p) == 1 and p.isupper()]
         if single_letters:
