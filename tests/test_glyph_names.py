@@ -19,6 +19,8 @@ TEST_CASES = [
     (0x0153, "oe-lat", "LATIN SMALL LIGATURE OE"),
     (0x0132, "IJ-lat", "LATIN CAPITAL LIGATURE IJ"),
     (0x0133, "ij-lat", "LATIN SMALL LIGATURE IJ"),
+    (0x00DF, "sharpS-lat", "LATIN SMALL LETTER SHARP S"),
+    (0x1E9E, "SharpS-lat", "LATIN CAPITAL LETTER SHARP S"),
     # Major world scripts - Arabic
     (0x0621, "hamza-ar", "ARABIC LETTER HAMZA"),
     (0x0622, "alefMaddaAbove-ar", "ARABIC LETTER ALEF WITH MADDA ABOVE"),
