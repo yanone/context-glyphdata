@@ -14,13 +14,19 @@ after Unicode version updates:
    - Catches typos or obsolete script names
    - Fails if >10 defined scripts are never found in character names
 
+3. **test_no_duplicate_glyph_names**: Checks entire Unicode catalog for
+   duplicate glyph name outputs.
+   - Ensures uniqueness of generated glyph names
+   - Fails if any duplicates are found
+
 These tests help ensure comprehensive script coverage as Unicode evolves.
 """
 
 import unittest
-from collections import Counter
+from collections import Counter, defaultdict
 import youseedee
 from context_glyphdata.core import SCRIPT_SUFFIXES, DROP_CATEGORIES
+from context_glyphdata import glyph_data_for_unicode
 
 
 class TestScriptCoverage(unittest.TestCase):
@@ -53,6 +59,86 @@ class TestScriptCoverage(unittest.TestCase):
                 "Please update SCRIPT_SUFFIXES."
             )
             self.fail("\n".join(msg_lines))
+
+    def test_no_duplicate_glyph_names(self):
+        """
+        Check entire Unicode catalog for duplicate glyph name outputs.
+
+        This test scans all Unicode codepoints and ensures that the
+        transformation produces unique glyph names. Any duplicates indicate
+        a problem with the transformation logic or missing script suffixes.
+        """
+        glyph_name_to_codepoints = defaultdict(list)
+        total_chars = 0
+
+        # Scan entire Unicode range (0x0000 to 0x10FFFF)
+        # We'll check every codepoint that has a name
+        print("\nScanning Unicode catalog for duplicate glyph names...")
+
+        for codepoint in range(0x0000, 0x110000):
+            try:
+                ucd = youseedee.ucd_data(codepoint)
+                if not ucd or "Name" not in ucd:
+                    continue
+
+                name = ucd["Name"]
+                if not name or name.startswith("<"):
+                    continue
+
+                # Generate glyph name
+                glyph_name = glyph_data_for_unicode(codepoint)
+                if glyph_name:
+                    glyph_name_to_codepoints[glyph_name].append((codepoint, name))
+                    total_chars += 1
+
+            except Exception:
+                # Skip characters that cause errors
+                continue
+
+        # Find duplicates
+        duplicates = {
+            glyph_name: codepoints
+            for glyph_name, codepoints in glyph_name_to_codepoints.items()
+            if len(codepoints) > 1
+        }
+
+        print(f"Scanned {total_chars} named characters")
+
+        if duplicates:
+            msg_lines = [
+                f"\nFound {len(duplicates)} duplicate glyph names:",
+                "",
+            ]
+
+            # Sort by number of duplicates (most problematic first)
+            sorted_duplicates = sorted(
+                duplicates.items(),
+                key=lambda x: len(x[1]),
+                reverse=True,
+            )
+
+            # Show first 20 most problematic duplicates
+            for glyph_name, codepoints in sorted_duplicates[:20]:
+                msg_lines.append(f"  '{glyph_name}' ({len(codepoints)} occurrences):")
+                for cp, unicode_name in codepoints[:5]:  # Show first 5
+                    msg_lines.append(f"    U+{cp:04X} {unicode_name}")
+                if len(codepoints) > 5:
+                    msg_lines.append(f"    ... and {len(codepoints) - 5} more")
+                msg_lines.append("")
+
+            if len(duplicates) > 20:
+                msg_lines.append(f"  ... and {len(duplicates) - 20} more duplicates")
+                msg_lines.append("")
+
+            msg_lines.append("Each Unicode character must produce a unique glyph name.")
+            msg_lines.append(
+                "Fix by adding missing script suffixes or adjusting "
+                "transformation logic."
+            )
+
+            self.fail("\n".join(msg_lines))
+        else:
+            print(f"✓ All {total_chars} glyph names are unique")
 
     def test_script_coverage_in_unicode_names(self):
         """

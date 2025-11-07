@@ -119,12 +119,7 @@ DROP_CATEGORIES = {
     "CHARACTER",
     "ACCENT",
     # Script-specific descriptive words
-    "CHOSEONG",  # Hangul: initial consonant
-    "JUNGSEONG",  # Hangul: medial vowel
-    "JONGSEONG",  # Hangul: final consonant
     "SUNG",  # Lao: tone marking variations (keep TAM, drop SUNG)
-    # Multi-part name separators (keep first word only)
-    "TIMES",  # Cuneiform: "A TIMES B" -> just "a"
     # Runic descriptive names - keep shortest form
 }
 
@@ -198,25 +193,21 @@ def glyph_data_for_unicode(decimal_unicode):
         for word in script_words_to_remove:
             parts = [p for p in parts if p != word]
 
-    # Handle special multi-part name formats
-    # For "X TIMES Y" (Cuneiform) -> keep only first word
-    if "TIMES" in parts:
-        times_index = parts.index("TIMES")
-        parts = parts[:times_index]
-
-    # For Runic multi-part names like "FEHU FEOH FE F" -> keep shortest
-    # These have multiple space-separated uppercase single-letter variants
-    if script_suffix == "-run" and len(parts) > 1:
-        # Find the shortest uppercase single-letter part
-        single_letters = [p for p in parts if len(p) == 1 and p.isupper()]
-        if single_letters:
-            parts = [single_letters[0]]
-        else:
-            # Keep the shortest part
-            parts = [min(parts, key=len)]
-
     # Remove category words
     parts = [p for p in parts if p not in DROP_CATEGORIES]
+
+    # Special handling for Hangul position indicators
+    # Keep track if it's initial/medial/final before removing
+    hangul_position = ""
+    if script_suffix == "-ko":
+        if "CHOSEONG" in name:
+            hangul_position = "Cho"  # Initial
+        elif "JUNGSEONG" in name:
+            hangul_position = "Jung"  # Medial
+        elif "JONGSEONG" in name:
+            hangul_position = "Jong"  # Final
+        # Remove the position words after saving them
+        parts = [p for p in parts if p not in {"CHOSEONG", "JUNGSEONG", "JONGSEONG"}]
 
     # Remove case indicator words
     parts = [p for p in parts if p not in CASE_INDICATORS]
@@ -224,6 +215,25 @@ def glyph_data_for_unicode(decimal_unicode):
     # Remove "WITH" and similar connecting words
     connecting_words = {"WITH", "AND", "OR", "FOR", "TO", "OF", "THE"}
     parts = [p for p in parts if p not in connecting_words]
+
+    # Handle special multi-part name formats AFTER filtering
+    # For Runic: handle hyphenated compounds and multi-part names
+    if script_suffix == "-run":
+        # Split hyphenated parts like "LONG-BRANCH-OSS"
+        expanded_parts = []
+        for part in parts:
+            if "-" in part:
+                # Split hyphenated parts
+                expanded_parts.extend(part.split("-"))
+            else:
+                expanded_parts.append(part)
+        parts = expanded_parts
+
+        # Remove single-letter transcriptions (not unique)
+        # but keep if it's the only part
+        multi_letter_parts = [p for p in parts if len(p) > 1]
+        if multi_letter_parts:
+            parts = multi_letter_parts
 
     # Special handling for Latin combining marks
     # For Latin script: "COMBINING GRAVE ACCENT" -> "gravecombining"
@@ -278,6 +288,10 @@ def glyph_data_for_unicode(decimal_unicode):
     # (before script suffix)
     if is_combining:
         glyph_name += "Combining"
+
+    # For Hangul, append position indicator (before script suffix)
+    if hangul_position:
+        glyph_name += hangul_position
 
     # Special handling for Arabic tanween marks
     # Replace "tan" suffix with "Tanween" for fathatan, dammatan, kasratan
