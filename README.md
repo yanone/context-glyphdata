@@ -29,7 +29,11 @@ print(glyph_name)  # Output: alef-ar
 
 # Example: GREEK CAPITAL LETTER ALPHA (U+0391)
 glyph_name = glyph_data_for_unicode(0x0391)
-print(glyph_name)  # Output: capitalAlpha-gr
+print(glyph_name)  # Output: Alpha-gr
+
+# Example: LATIN CAPITAL LETTER AE (U+00C6)
+glyph_name = glyph_data_for_unicode(0x00C6)
+print(glyph_name)  # Output: AE-lat
 ```
 
 ### Command-Line Tool
@@ -59,13 +63,22 @@ context-glyphdata ا
 
 2. **Category Removal**: Drops generic category words like LETTER, SYMBOL, MARK, etc.
 
-3. **camelCase Conversion**: Converts the remaining words to camelCase format
+3. **Case Handling**: Removes "CAPITAL" and "SMALL" tokens and uses actual letter casing instead
+   - Capital letters: Uppercase (e.g., `A`, `Alpha`)
+   - Small letters: Lowercase (e.g., `a`, `alpha`)
+   - Multi-letter ligatures: Keep case (e.g., `AE`, `ae`)
+
+4. **camelCase Conversion**: Converts the remaining words to camelCase format
 
 ### Examples
 
 - `ARABIC LETTER ALEF` → `alef-ar`
-- `GREEK CAPITAL LETTER ALPHA` → `capitalAlpha-gr`
-- `LATIN CAPITAL LETTER A` → `capitalA-lat`
+- `GREEK CAPITAL LETTER ALPHA` → `Alpha-gr`
+- `GREEK SMALL LETTER ALPHA` → `alpha-gr`
+- `LATIN CAPITAL LETTER A` → `A-lat`
+- `LATIN SMALL LETTER A` → `a-lat`
+- `LATIN CAPITAL LETTER AE` → `AE-lat`
+- `LATIN SMALL LETTER AE` → `ae-lat`
 - `HEBREW LETTER ALEF` → `alef-he`
 
 ## Development

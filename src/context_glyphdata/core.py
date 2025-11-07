@@ -59,6 +59,12 @@ DROP_CATEGORIES = {
     "ACCENT",
 }
 
+# Case indicator words to drop (we'll use actual casing instead)
+CASE_INDICATORS = {
+    "CAPITAL",
+    "SMALL",
+}
+
 
 def glyph_data_for_unicode(decimal_unicode):
     """
@@ -86,6 +92,9 @@ def glyph_data_for_unicode(decimal_unicode):
     # Start processing the name
     parts = name.split()
 
+    # Check if this is a capital letter (before removing case indicators)
+    is_capital = "CAPITAL" in parts
+
     # Detect script suffix
     script_suffix = ""
     for script, suffix in SCRIPT_SUFFIXES.items():
@@ -98,6 +107,9 @@ def glyph_data_for_unicode(decimal_unicode):
     # Remove category words
     parts = [p for p in parts if p not in DROP_CATEGORIES]
 
+    # Remove case indicator words
+    parts = [p for p in parts if p not in CASE_INDICATORS]
+
     # Remove "WITH" and similar connecting words
     connecting_words = {"WITH", "AND", "OR", "FOR", "TO", "OF", "THE"}
     parts = [p for p in parts if p not in connecting_words]
@@ -106,9 +118,34 @@ def glyph_data_for_unicode(decimal_unicode):
         # If nothing left, use fallback
         return f"uni{decimal_unicode:04X}"
 
-    # Convert to camelCase
-    # First word is lowercase, rest are title case
-    glyph_name = parts[0].lower()
+    # Convert to camelCase with proper casing
+    # For capital letters: First letter uppercase, rest lowercase
+    # For small letters: All lowercase in first word
+    # For multi-letter acronyms (AE, OE, IJ): keep all uppercase
+    # Subsequent words are always title case
+
+    first_part = parts[0]
+
+    # Check if first part is a multi-letter acronym
+    # These are ligatures composed of single letters (AE, OE, IJ)
+    is_multi_letter_acronym = (
+        len(first_part) <= 3  # Short enough to be a ligature
+        and first_part.isupper()  # All uppercase
+        and is_capital  # Is a capital letter
+        and all(c.isalpha() for c in first_part)  # Only letters
+    )
+
+    if is_multi_letter_acronym:
+        # Keep as uppercase (e.g., AE, OE, IJ)
+        glyph_name = first_part
+    elif is_capital:
+        # Capital letter: First letter uppercase, rest lowercase
+        glyph_name = first_part.capitalize()
+    else:
+        # Small letter or no case indicator: all lowercase
+        glyph_name = first_part.lower()
+
+    # Add remaining parts in title case
     for part in parts[1:]:
         glyph_name += part.capitalize()
 
