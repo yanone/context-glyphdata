@@ -1,270 +1,224 @@
 """Unit tests for glyph name generation."""
 
 import unittest
+import youseedee
 from context_glyphdata import glyph_data_for_unicode
+
+
+# Test data: (codepoint, expected_result, unicode_name)
+# Organized by script categories matching SCRIPT_SUFFIXES
+TEST_CASES = [
+    # Major world scripts - Latin
+    (0x0041, "A-lat", "LATIN CAPITAL LETTER A"),
+    (0x0061, "a-lat", "LATIN SMALL LETTER A"),
+    (0x005A, "Z-lat", "LATIN CAPITAL LETTER Z"),
+    (0x007A, "z-lat", "LATIN SMALL LETTER Z"),
+    (0x00C6, "AE-lat", "LATIN CAPITAL LETTER AE"),
+    (0x00E6, "ae-lat", "LATIN SMALL LETTER AE"),
+    (0x0152, "OE-lat", "LATIN CAPITAL LIGATURE OE"),
+    (0x0153, "oe-lat", "LATIN SMALL LIGATURE OE"),
+    (0x0132, "IJ-lat", "LATIN CAPITAL LIGATURE IJ"),
+    (0x0133, "ij-lat", "LATIN SMALL LIGATURE IJ"),
+    # Major world scripts - Arabic
+    (0x0621, "hamza-ar", "ARABIC LETTER HAMZA"),
+    (0x0622, "alefMaddaAbove-ar", "ARABIC LETTER ALEF WITH MADDA ABOVE"),
+    (0x0623, "alefHamzaAbove-ar", "ARABIC LETTER ALEF WITH HAMZA ABOVE"),
+    (0x0624, "wawHamzaAbove-ar", "ARABIC LETTER WAW WITH HAMZA ABOVE"),
+    (0x0625, "alefHamzaBelow-ar", "ARABIC LETTER ALEF WITH HAMZA BELOW"),
+    (0x0626, "yehHamzaAbove-ar", "ARABIC LETTER YEH WITH HAMZA ABOVE"),
+    (0x0627, "alef-ar", "ARABIC LETTER ALEF"),
+    (0x0628, "beh-ar", "ARABIC LETTER BEH"),
+    (0x0629, "tehMarbuta-ar", "ARABIC LETTER TEH MARBUTA"),
+    (0x062D, "hah-ar", "ARABIC LETTER HAH"),
+    (0x0633, "seen-ar", "ARABIC LETTER SEEN"),
+    (0x0639, "ain-ar", "ARABIC LETTER AIN"),
+    (0x0642, "qaf-ar", "ARABIC LETTER QAF"),
+    (0x0644, "lam-ar", "ARABIC LETTER LAM"),
+    (0x0646, "noon-ar", "ARABIC LETTER NOON"),
+    (0x0647, "heh-ar", "ARABIC LETTER HEH"),
+    (0x064A, "yeh-ar", "ARABIC LETTER YEH"),
+    # Major world scripts - Greek
+    (0x0391, "Alpha-gr", "GREEK CAPITAL LETTER ALPHA"),
+    (0x0392, "Beta-gr", "GREEK CAPITAL LETTER BETA"),
+    (0x0393, "Gamma-gr", "GREEK CAPITAL LETTER GAMMA"),
+    (0x03B1, "alpha-gr", "GREEK SMALL LETTER ALPHA"),
+    (0x03B2, "beta-gr", "GREEK SMALL LETTER BETA"),
+    (0x03C9, "omega-gr", "GREEK SMALL LETTER OMEGA"),
+    # Major world scripts - Cyrillic
+    (0x0410, "A-cyr", "CYRILLIC CAPITAL LETTER A"),
+    (0x0411, "Be-cyr", "CYRILLIC CAPITAL LETTER BE"),
+    (0x0412, "Ve-cyr", "CYRILLIC CAPITAL LETTER VE"),
+    (0x0430, "a-cyr", "CYRILLIC SMALL LETTER A"),
+    (0x0431, "be-cyr", "CYRILLIC SMALL LETTER BE"),
+    (0x0432, "ve-cyr", "CYRILLIC SMALL LETTER VE"),
+    # Major world scripts - Hebrew
+    (0x05D0, "alef-he", "HEBREW LETTER ALEF"),
+    (0x05D1, "bet-he", "HEBREW LETTER BET"),
+    (0x05D2, "gimel-he", "HEBREW LETTER GIMEL"),
+    # Major world scripts - Armenian
+    (0x0531, "Ayb-arm", "ARMENIAN CAPITAL LETTER AYB"),
+    (0x0532, "Ben-arm", "ARMENIAN CAPITAL LETTER BEN"),
+    (0x0561, "ayb-arm", "ARMENIAN SMALL LETTER AYB"),
+    # Indic scripts - Devanagari
+    (0x0905, "a-dev", "DEVANAGARI LETTER A"),
+    (0x0906, "aa-dev", "DEVANAGARI LETTER AA"),
+    (0x0915, "ka-dev", "DEVANAGARI LETTER KA"),
+    # Indic scripts - Bengali
+    (0x0985, "a-bn", "BENGALI LETTER A"),
+    (0x0986, "aa-bn", "BENGALI LETTER AA"),
+    (0x0995, "ka-bn", "BENGALI LETTER KA"),
+    # Indic scripts - Gurmukhi
+    (0x0A05, "a-gu", "GURMUKHI LETTER A"),
+    (0x0A06, "aa-gu", "GURMUKHI LETTER AA"),
+    (0x0A15, "ka-gu", "GURMUKHI LETTER KA"),
+    # Indic scripts - Gujarati
+    (0x0A85, "a-gj", "GUJARATI LETTER A"),
+    (0x0A86, "aa-gj", "GUJARATI LETTER AA"),
+    (0x0A95, "ka-gj", "GUJARATI LETTER KA"),
+    # Indic scripts - Tamil
+    (0x0B85, "a-ta", "TAMIL LETTER A"),
+    (0x0B86, "aa-ta", "TAMIL LETTER AA"),
+    (0x0B95, "ka-ta", "TAMIL LETTER KA"),
+    # Indic scripts - Telugu
+    (0x0C05, "a-te", "TELUGU LETTER A"),
+    (0x0C06, "aa-te", "TELUGU LETTER AA"),
+    (0x0C15, "ka-te", "TELUGU LETTER KA"),
+    # Indic scripts - Kannada
+    (0x0C85, "a-kn", "KANNADA LETTER A"),
+    (0x0C86, "aa-kn", "KANNADA LETTER AA"),
+    (0x0C95, "ka-kn", "KANNADA LETTER KA"),
+    # Indic scripts - Malayalam
+    (0x0D05, "a-ml", "MALAYALAM LETTER A"),
+    (0x0D06, "aa-ml", "MALAYALAM LETTER AA"),
+    (0x0D15, "ka-ml", "MALAYALAM LETTER KA"),
+    # Indic scripts - Sinhala
+    (0x0D85, "ayanna-si", "SINHALA LETTER AYANNA"),
+    (0x0D86, "aayanna-si", "SINHALA LETTER AAYANNA"),
+    (0x0D9A, "alpapraanaKayanna-si", "SINHALA LETTER ALPAPRAANA KAYANNA"),
+    # Southeast Asian scripts - Thai
+    (0x0E01, "koKai-th", "THAI CHARACTER KO KAI"),
+    (0x0E02, "khoKhai-th", "THAI CHARACTER KHO KHAI"),
+    (0x0E03, "khoKhuat-th", "THAI CHARACTER KHO KHUAT"),
+    # Southeast Asian scripts - Lao
+    (0x0E81, "ko-lo", "LAO LETTER KO"),
+    (0x0E82, "kho-lo", "LAO LETTER KHO SUNG"),
+    (0x0E84, "khoTam-lo", "LAO LETTER KHO TAM"),
+    # Southeast Asian scripts - Myanmar
+    (0x1000, "ka-my", "MYANMAR LETTER KA"),
+    (0x1001, "kha-my", "MYANMAR LETTER KHA"),
+    (0x1002, "ga-my", "MYANMAR LETTER GA"),
+    # Southeast Asian scripts - Khmer
+    (0x1780, "ka-km", "KHMER LETTER KA"),
+    (0x1781, "kha-km", "KHMER LETTER KHA"),
+    (0x1782, "ko-km", "KHMER LETTER KO"),
+    # Tibetan & Himalayan - Tibetan
+    (0x0F40, "ka-ti", "TIBETAN LETTER KA"),
+    (0x0F41, "kha-ti", "TIBETAN LETTER KHA"),
+    (0x0F42, "ga-ti", "TIBETAN LETTER GA"),
+    # East Asian scripts - Hangul
+    (0x1100, "kiyeok-ko", "HANGUL CHOSEONG KIYEOK"),
+    (0x1101, "ssangkiyeok-ko", "HANGUL CHOSEONG SSANGKIYEOK"),
+    (0x1102, "nieun-ko", "HANGUL CHOSEONG NIEUN"),
+    # East Asian scripts - Hiragana
+    (0x3041, "a-hira", "HIRAGANA LETTER SMALL A"),
+    (0x3042, "a-hira", "HIRAGANA LETTER A"),
+    (0x3044, "i-hira", "HIRAGANA LETTER I"),
+    # East Asian scripts - Katakana
+    (0x30A1, "a-kata", "KATAKANA LETTER SMALL A"),
+    (0x30A2, "a-kata", "KATAKANA LETTER A"),
+    (0x30A4, "i-kata", "KATAKANA LETTER I"),
+    # East Asian scripts - Bopomofo
+    (0x3105, "b-bo", "BOPOMOFO LETTER B"),
+    (0x3106, "p-bo", "BOPOMOFO LETTER P"),
+    (0x3107, "m-bo", "BOPOMOFO LETTER M"),
+    # East Asian scripts - Yi
+    (0xA000, "it-yi", "YI SYLLABLE IT"),
+    (0xA001, "ix-yi", "YI SYLLABLE IX"),
+    (0xA002, "i-yi", "YI SYLLABLE I"),
+    # African scripts - Ethiopic
+    (0x1200, "ha-et", "ETHIOPIC SYLLABLE HA"),
+    (0x1201, "hu-et", "ETHIOPIC SYLLABLE HU"),
+    (0x1202, "hi-et", "ETHIOPIC SYLLABLE HI"),
+    # African scripts - Vai
+    (0xA500, "ee-vai", "VAI SYLLABLE EE"),
+    (0xA501, "een-vai", "VAI SYLLABLE EEN"),
+    (0xA502, "hee-vai", "VAI SYLLABLE HEE"),
+    # African scripts - Bamum
+    (0xA6A0, "a-bam", "BAMUM LETTER A"),
+    (0xA6A1, "ka-bam", "BAMUM LETTER KA"),
+    (0xA6A2, "u-bam", "BAMUM LETTER U"),
+    # African scripts - NKo
+    (0x07CA, "a-nko", "NKO LETTER A"),
+    (0x07CB, "ee-nko", "NKO LETTER EE"),
+    (0x07CC, "i-nko", "NKO LETTER I"),
+    # American scripts - Cherokee
+    (0x13A0, "a-chr", "CHEROKEE LETTER A"),
+    (0x13A1, "e-chr", "CHEROKEE LETTER E"),
+    (0x13A2, "i-chr", "CHEROKEE LETTER I"),
+    # Historical scripts - Georgian
+    (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
+    (0x10A1, "Ban-geo", "GEORGIAN CAPITAL LETTER BAN"),
+    (0x10D0, "an-geo", "GEORGIAN LETTER AN"),
+    # Historical scripts - Glagolitic
+    (0x2C00, "Azu-glag", "GLAGOLITIC CAPITAL LETTER AZU"),
+    (0x2C01, "Buky-glag", "GLAGOLITIC CAPITAL LETTER BUKY"),
+    (0x2C30, "azu-glag", "GLAGOLITIC SMALL LETTER AZU"),
+    # Historical scripts - Coptic
+    (0x2C80, "Alfa-cop", "COPTIC CAPITAL LETTER ALFA"),
+    (0x2C81, "alfa-cop", "COPTIC SMALL LETTER ALFA"),
+    (0x2C82, "Vida-cop", "COPTIC CAPITAL LETTER VIDA"),
+    # Historical scripts - Ogham
+    (0x1681, "beith-og", "OGHAM LETTER BEITH"),
+    (0x1682, "luis-og", "OGHAM LETTER LUIS"),
+    (0x1683, "fearn-og", "OGHAM LETTER FEARN"),
+    # Historical scripts - Runic
+    (0x16A0, "f-ru", "RUNIC LETTER FEHU FEOH FE F"),
+    (0x16A1, "v-ru", "RUNIC LETTER V"),
+    (0x16A2, "u-ru", "RUNIC LETTER URUZ UR U"),
+    # Ancient scripts - Cuneiform
+    (0x12000, "a-xsux", "CUNEIFORM SIGN A"),
+    (0x12001, "a-xsux", "CUNEIFORM SIGN A TIMES A"),
+    (0x12002, "a-xsux", "CUNEIFORM SIGN A TIMES BAD"),
+    (0x12002, "a-xsux", "CUNEIFORM SIGN A TIMES BAD"),
+    # Symbols (no script)
+    (0x0024, "dollar", "DOLLAR SIGN"),
+    (0x0025, "percent", "PERCENT SIGN"),
+    (0x0026, "ampersand", "AMPERSAND"),
+    (0x002A, "asterisk", "ASTERISK"),
+    (0x002B, "plus", "PLUS SIGN"),
+    (0x003D, "equals", "EQUALS SIGN"),
+    (0x0040, "commercialAt", "COMMERCIAL AT"),
+]
 
 
 class TestGlyphNameGeneration(unittest.TestCase):
     """Test cases for glyph name transformation."""
 
-    def test_arabic_letter_alef(self):
-        """Test: ARABIC LETTER ALEF -> alef-ar"""
-        # U+0627 ARABIC LETTER ALEF
-        result = glyph_data_for_unicode(0x0627)
-        self.assertEqual(result, "alef-ar")
+    def test_all_glyph_names(self):
+        """Test all glyph name transformations with data validation."""
+        for codepoint, expected_result, expected_name in TEST_CASES:
+            with self.subTest(codepoint=f"U+{codepoint:04X}"):
+                # Verify the Unicode name matches our test data
+                ucd = youseedee.ucd_data(codepoint)
+                self.assertIsNotNone(ucd, f"No UCD data for U+{codepoint:04X}")
+                self.assertIn("Name", ucd, f"No name in UCD for U+{codepoint:04X}")
 
-    def test_arabic_letter_beh(self):
-        """Test: ARABIC LETTER BEH -> beh-ar"""
-        # U+0628 ARABIC LETTER BEH
-        result = glyph_data_for_unicode(0x0628)
-        self.assertEqual(result, "beh-ar")
+                actual_name = ucd["Name"]
+                self.assertEqual(
+                    actual_name,
+                    expected_name,
+                    f"Unicode name mismatch for U+{codepoint:04X}: "
+                    f"expected '{expected_name}', got '{actual_name}'",
+                )
 
-    def test_latin_capital_letter_a(self):
-        """Test: LATIN CAPITAL LETTER A -> A-lat"""
-        # U+0041 LATIN CAPITAL LETTER A
-        result = glyph_data_for_unicode(0x0041)
-        self.assertEqual(result, "A-lat")
-
-    def test_greek_letter(self):
-        """Test: GREEK CAPITAL LETTER ALPHA -> Alpha-gr"""
-        # U+0391 GREEK CAPITAL LETTER ALPHA
-        result = glyph_data_for_unicode(0x0391)
-        self.assertEqual(result, "Alpha-gr")
-
-    def test_cyrillic_letter(self):
-        """Test: CYRILLIC CAPITAL LETTER A -> A-cyr"""
-        # U+0410 CYRILLIC CAPITAL LETTER A
-        result = glyph_data_for_unicode(0x0410)
-        self.assertEqual(result, "A-cyr")
-
-    def test_hebrew_letter(self):
-        """Test: HEBREW LETTER ALEF -> alef-he"""
-        # U+05D0 HEBREW LETTER ALEF
-        result = glyph_data_for_unicode(0x05D0)
-        self.assertEqual(result, "alef-he")
-
-    def test_thai_letter(self):
-        """Test: THAI CHARACTER KO KAI -> koKai-th"""
-        # U+0E01 THAI CHARACTER KO KAI
-        result = glyph_data_for_unicode(0x0E01)
-        # Note: THAI uses "CHARACTER" not "LETTER"
-        self.assertEqual(result, "koKai-th")
-
-    def test_devanagari_letter(self):
-        """Test: DEVANAGARI LETTER KA -> ka-dev"""
-        # U+0915 DEVANAGARI LETTER KA
-        result = glyph_data_for_unicode(0x0915)
-        self.assertEqual(result, "ka-dev")
-
-    def test_no_script_fallback(self):
-        """Test characters without recognized scripts use fallback"""
-        # U+0020 SPACE (no script in name)
-        result = glyph_data_for_unicode(0x0020)
-        # Should return some form of name, exact format may vary
-        self.assertIsInstance(result, str)
-        self.assertTrue(len(result) > 0)
-
-    # Lowercase letter tests
-    def test_latin_small_letter_a(self):
-        """Test: LATIN SMALL LETTER A -> a-lat"""
-        # U+0061 LATIN SMALL LETTER A
-        result = glyph_data_for_unicode(0x0061)
-        self.assertEqual(result, "a-lat")
-
-    def test_latin_small_letter_z(self):
-        """Test: LATIN SMALL LETTER Z -> z-lat"""
-        # U+007A LATIN SMALL LETTER Z
-        result = glyph_data_for_unicode(0x007A)
-        self.assertEqual(result, "z-lat")
-
-    def test_greek_small_letter_alpha(self):
-        """Test: GREEK SMALL LETTER ALPHA -> alpha-gr"""
-        # U+03B1 GREEK SMALL LETTER ALPHA
-        result = glyph_data_for_unicode(0x03B1)
-        self.assertEqual(result, "alpha-gr")
-
-    def test_greek_small_letter_omega(self):
-        """Test: GREEK SMALL LETTER OMEGA -> omega-gr"""
-        # U+03C9 GREEK SMALL LETTER OMEGA
-        result = glyph_data_for_unicode(0x03C9)
-        self.assertEqual(result, "omega-gr")
-
-    def test_cyrillic_small_letter_a(self):
-        """Test: CYRILLIC SMALL LETTER A -> a-cyr"""
-        # U+0430 CYRILLIC SMALL LETTER A
-        result = glyph_data_for_unicode(0x0430)
-        self.assertEqual(result, "a-cyr")
-
-    # Symbol tests
-    def test_plus_sign(self):
-        """Test: PLUS SIGN -> plus"""
-        # U+002B PLUS SIGN
-        result = glyph_data_for_unicode(0x002B)
-        self.assertEqual(result, "plus")
-
-    def test_equals_sign(self):
-        """Test: EQUALS SIGN -> equals"""
-        # U+003D EQUALS SIGN
-        result = glyph_data_for_unicode(0x003D)
-        self.assertEqual(result, "equals")
-
-    def test_asterisk(self):
-        """Test: ASTERISK -> asterisk"""
-        # U+002A ASTERISK
-        result = glyph_data_for_unicode(0x002A)
-        self.assertEqual(result, "asterisk")
-
-    def test_ampersand(self):
-        """Test: AMPERSAND -> ampersand"""
-        # U+0026 AMPERSAND
-        result = glyph_data_for_unicode(0x0026)
-        self.assertEqual(result, "ampersand")
-
-    def test_at_sign(self):
-        """Test: COMMERCIAL AT -> commercial"""
-        # U+0040 COMMERCIAL AT
-        result = glyph_data_for_unicode(0x0040)
-        self.assertEqual(result, "commercialAt")
-
-    def test_dollar_sign(self):
-        """Test: DOLLAR SIGN -> dollar"""
-        # U+0024 DOLLAR SIGN
-        result = glyph_data_for_unicode(0x0024)
-        self.assertEqual(result, "dollar")
-
-    def test_percent_sign(self):
-        """Test: PERCENT SIGN -> percent"""
-        # U+0025 PERCENT SIGN
-        result = glyph_data_for_unicode(0x0025)
-        self.assertEqual(result, "percent")
-
-    # Multi-part Arabic character tests
-    def test_arabic_letter_teh_marbuta(self):
-        """Test: ARABIC LETTER TEH MARBUTA -> tehMarbuta-ar"""
-        # U+0629 ARABIC LETTER TEH MARBUTA
-        result = glyph_data_for_unicode(0x0629)
-        self.assertEqual(result, "tehMarbuta-ar")
-
-    def test_arabic_letter_hah(self):
-        """Test: ARABIC LETTER HAH -> hah-ar"""
-        # U+062D ARABIC LETTER HAH
-        result = glyph_data_for_unicode(0x062D)
-        self.assertEqual(result, "hah-ar")
-
-    def test_arabic_letter_seen(self):
-        """Test: ARABIC LETTER SEEN -> seen-ar"""
-        # U+0633 ARABIC LETTER SEEN
-        result = glyph_data_for_unicode(0x0633)
-        self.assertEqual(result, "seen-ar")
-
-    def test_arabic_letter_ain(self):
-        """Test: ARABIC LETTER AIN -> ain-ar"""
-        # U+0639 ARABIC LETTER AIN
-        result = glyph_data_for_unicode(0x0639)
-        self.assertEqual(result, "ain-ar")
-
-    def test_arabic_letter_qaf(self):
-        """Test: ARABIC LETTER QAF -> qaf-ar"""
-        # U+0642 ARABIC LETTER QAF
-        result = glyph_data_for_unicode(0x0642)
-        self.assertEqual(result, "qaf-ar")
-
-    def test_arabic_letter_lam(self):
-        """Test: ARABIC LETTER LAM -> lam-ar"""
-        # U+0644 ARABIC LETTER LAM
-        result = glyph_data_for_unicode(0x0644)
-        self.assertEqual(result, "lam-ar")
-
-    def test_arabic_letter_noon(self):
-        """Test: ARABIC LETTER NOON -> noon-ar"""
-        # U+0646 ARABIC LETTER NOON
-        result = glyph_data_for_unicode(0x0646)
-        self.assertEqual(result, "noon-ar")
-
-    def test_arabic_letter_heh(self):
-        """Test: ARABIC LETTER HEH -> heh-ar"""
-        # U+0647 ARABIC LETTER HEH
-        result = glyph_data_for_unicode(0x0647)
-        self.assertEqual(result, "heh-ar")
-
-    def test_arabic_letter_yeh(self):
-        """Test: ARABIC LETTER YEH -> yeh-ar"""
-        # U+064A ARABIC LETTER YEH
-        result = glyph_data_for_unicode(0x064A)
-        self.assertEqual(result, "yeh-ar")
-
-    def test_arabic_letter_hamza(self):
-        """Test: ARABIC LETTER HAMZA -> hamza-ar"""
-        # U+0621 ARABIC LETTER HAMZA
-        result = glyph_data_for_unicode(0x0621)
-        self.assertEqual(result, "hamza-ar")
-
-    def test_arabic_letter_alef_with_madda_above(self):
-        """Test: ARABIC LETTER ALEF WITH MADDA ABOVE -> alefMaddaAbove-ar"""
-        # U+0622 ARABIC LETTER ALEF WITH MADDA ABOVE
-        result = glyph_data_for_unicode(0x0622)
-        self.assertEqual(result, "alefMaddaAbove-ar")
-
-    def test_arabic_letter_alef_with_hamza_above(self):
-        """Test: ARABIC LETTER ALEF WITH HAMZA ABOVE -> alefHamzaAbove-ar"""
-        # U+0623 ARABIC LETTER ALEF WITH HAMZA ABOVE
-        result = glyph_data_for_unicode(0x0623)
-        self.assertEqual(result, "alefHamzaAbove-ar")
-
-    def test_arabic_letter_waw_with_hamza_above(self):
-        """Test: ARABIC LETTER WAW WITH HAMZA ABOVE -> wawHamzaAbove-ar"""
-        # U+0624 ARABIC LETTER WAW WITH HAMZA ABOVE
-        result = glyph_data_for_unicode(0x0624)
-        self.assertEqual(result, "wawHamzaAbove-ar")
-
-    def test_arabic_letter_alef_with_hamza_below(self):
-        """Test: ARABIC LETTER ALEF WITH HAMZA BELOW -> alefHamzaBelow-ar"""
-        # U+0625 ARABIC LETTER ALEF WITH HAMZA BELOW
-        result = glyph_data_for_unicode(0x0625)
-        self.assertEqual(result, "alefHamzaBelow-ar")
-
-    def test_arabic_letter_yeh_with_hamza_above(self):
-        """Test: ARABIC LETTER YEH WITH HAMZA ABOVE -> yehHamzaAbove-ar"""
-        # U+0626 ARABIC LETTER YEH WITH HAMZA ABOVE
-        result = glyph_data_for_unicode(0x0626)
-        self.assertEqual(result, "yehHamzaAbove-ar")
-
-    # Multi-letter ligature tests (all uppercase)
-    def test_latin_capital_ligature_ae(self):
-        """Test: LATIN CAPITAL LETTER AE -> AE-lat"""
-        # U+00C6 LATIN CAPITAL LETTER AE
-        result = glyph_data_for_unicode(0x00C6)
-        self.assertEqual(result, "AE-lat")
-
-    def test_latin_small_ligature_ae(self):
-        """Test: LATIN SMALL LETTER AE -> ae-lat"""
-        # U+00E6 LATIN SMALL LETTER AE
-        result = glyph_data_for_unicode(0x00E6)
-        self.assertEqual(result, "ae-lat")
-
-    def test_latin_capital_ligature_oe(self):
-        """Test: LATIN CAPITAL LETTER OE -> OE-lat"""
-        # U+0152 LATIN CAPITAL LETTER OE
-        result = glyph_data_for_unicode(0x0152)
-        self.assertEqual(result, "OE-lat")
-
-    def test_latin_small_ligature_oe(self):
-        """Test: LATIN SMALL LETTER OE -> oe-lat"""
-        # U+0153 LATIN SMALL LETTER OE
-        result = glyph_data_for_unicode(0x0153)
-        self.assertEqual(result, "oe-lat")
-
-    def test_latin_capital_ligature_ij(self):
-        """Test: LATIN CAPITAL LETTER IJ -> IJ-lat"""
-        # U+0132 LATIN CAPITAL LETTER IJ
-        result = glyph_data_for_unicode(0x0132)
-        self.assertEqual(result, "IJ-lat")
-
-    def test_latin_small_ligature_ij(self):
-        """Test: LATIN SMALL LETTER IJ -> ij-lat"""
-        # U+0133 LATIN SMALL LETTER IJ
-        result = glyph_data_for_unicode(0x0133)
-        self.assertEqual(result, "ij-lat")
+                # Test the glyph name generation
+                result = glyph_data_for_unicode(codepoint)
+                self.assertEqual(
+                    result,
+                    expected_result,
+                    f"U+{codepoint:04X} {expected_name}: "
+                    f"expected '{expected_result}', got '{result}'",
+                )
 
 
 if __name__ == "__main__":

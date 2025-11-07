@@ -4,12 +4,17 @@ import youseedee
 
 
 # Mapping of script names to their short suffixes
+# Compiled from analysis of actual Unicode character names
+# Covers the most common scripts found in Unicode character names
 SCRIPT_SUFFIXES = {
+    # Major world scripts
     "ARABIC": "-ar",
     "LATIN": "-lat",
     "GREEK": "-gr",
     "CYRILLIC": "-cyr",
     "HEBREW": "-he",
+    "ARMENIAN": "-arm",
+    # Indic scripts
     "DEVANAGARI": "-dev",
     "BENGALI": "-bn",
     "GURMUKHI": "-gu",
@@ -20,29 +25,87 @@ SCRIPT_SUFFIXES = {
     "KANNADA": "-kn",
     "MALAYALAM": "-ml",
     "SINHALA": "-si",
+    "GRANTHA": "-gran",
+    "BRAHMI": "-brah",
+    "KAITHI": "-kthi",
+    "SHARADA": "-shrd",
+    "BHAIKSUKI": "-bhks",
+    "KHUDAWADI": "-sind",
+    # Southeast Asian scripts
     "THAI": "-th",
     "LAO": "-lo",
-    "TIBETAN": "-ti",
     "MYANMAR": "-my",
-    "GEORGIAN": "-geo",
-    "HANGUL": "-ko",
-    "ETHIOPIC": "-et",
-    "CHEROKEE": "-chr",
-    "CANADIAN": "-ca",
-    "OGHAM": "-og",
-    "RUNIC": "-ru",
     "KHMER": "-km",
-    "MONGOLIAN": "-mn",
+    "JAVANESE": "-java",
+    "BALINESE": "-bali",
+    "CHAM": "-cham",
+    # Tibetan & Himalayan
+    "TIBETAN": "-ti",
+    "LEPCHA": "-lepc",
+    "LIMBU": "-limb",
+    # East Asian scripts
+    "HAN": "-han",
+    "HANGUL": "-ko",
     "HIRAGANA": "-hira",
     "KATAKANA": "-kata",
     "BOPOMOFO": "-bo",
-    "HAN": "-han",
     "YI": "-yi",
-    "ARMENIAN": "-arm",
+    # African scripts
+    "ETHIOPIC": "-et",
+    "VAI": "-vai",
+    "BAMUM": "-bam",
+    "ADLAM": "-adlm",
+    "NKO": "-nko",
+    "TIFINAGH": "-tfng",
+    "OSMANYA": "-osma",
+    # American scripts
+    "CHEROKEE": "-chr",
+    "CANADIAN": "-ca",
+    "DESERET": "-dsrt",
+    "OSAGE": "-osge",
+    # Central Asian scripts
+    "MONGOLIAN": "-mn",
+    "TIBETAN": "-ti",
+    "PHAGS-PA": "-phag",
+    # Historical scripts
+    "GEORGIAN": "-geo",
+    "GLAGOLITIC": "-glag",
+    "COPTIC": "-cop",
+    "OGHAM": "-og",
+    "RUNIC": "-ru",
+    "GOTHIC": "-goth",
+    # Ancient scripts
+    "CUNEIFORM": "-xsux",
+    "EGYPTIAN": "-egy",
+    "ANATOLIAN": "-hluw",
+    "LINEAR": "-lin",
+    "CYPRIOT": "-cprt",
+    "PHOENICIAN": "-phnx",
+    "ARAMAIC": "-arc",
+    "HEBREW": "-he",
+    "AVESTAN": "-avst",
+    "UGARITIC": "-ugar",
+    # Other scripts
+    "DUPLOYAN": "-dupl",
+    "MENDE": "-men",
+    "MIAO": "-plrd",
+    "SAURASHTRA": "-saur",
+    "HENTAIGANA": "-hent",
+    "MASARAM": "-gonm",
+    "GUNJALA": "-gong",
+    "CYPRO-MINOAN": "-cpmn",
+    "TANGUT": "-tang",
+    "NUSHU": "-nshu",
+    # Multi-word script names
+    "CAUCASIAN ALBANIAN": "-aghb",
+    "MRO": "-mroo",
+    "TAI": "-tai",  # Covers Tai Le, Tai Tham, Tai Viet, etc.
+    "OLD": "-old",  # Covers Old Italic, Old Persian, etc.
 }
 
-# Categories to drop from the name
+# Categories and descriptive words to drop from the name
 DROP_CATEGORIES = {
+    # General categories
     "LETTER",
     "MARK",
     "NUMBER",
@@ -57,6 +120,14 @@ DROP_CATEGORIES = {
     "IDEOGRAPH",
     "CHARACTER",
     "ACCENT",
+    # Script-specific descriptive words
+    "CHOSEONG",  # Hangul: initial consonant
+    "JUNGSEONG",  # Hangul: medial vowel
+    "JONGSEONG",  # Hangul: final consonant
+    "SUNG",  # Lao: tone marking variations (keep TAM, drop SUNG)
+    # Multi-part name separators (keep first word only)
+    "TIMES",  # Cuneiform: "A TIMES B" -> just "a"
+    # Runic descriptive names - keep shortest form
 }
 
 # Case indicator words to drop (we'll use actual casing instead)
@@ -95,14 +166,56 @@ def glyph_data_for_unicode(decimal_unicode):
     # Check if this is a capital letter (before removing case indicators)
     is_capital = "CAPITAL" in parts
 
-    # Detect script suffix
+    # Detect script suffix (check multi-word scripts first, then single-word)
     script_suffix = ""
-    for script, suffix in SCRIPT_SUFFIXES.items():
-        if script in parts:
-            script_suffix = suffix
-            # Remove script name from parts
-            parts = [p for p in parts if p != script]
-            break
+    script_words_to_remove = []
+
+    # Sort scripts by word count (descending) to match multi-word scripts first
+    sorted_scripts = sorted(
+        SCRIPT_SUFFIXES.items(), key=lambda x: len(x[0].split()), reverse=True
+    )
+
+    for script, suffix in sorted_scripts:
+        script_parts = script.split()
+        # Check if all words of the script name appear consecutively in parts
+        if len(script_parts) == 1:
+            # Single-word script
+            if script in parts:
+                script_suffix = suffix
+                script_words_to_remove = [script]
+                break
+        else:
+            # Multi-word script - check for consecutive match
+            for i in range(len(parts) - len(script_parts) + 1):
+                if parts[i : i + len(script_parts)] == script_parts:
+                    script_suffix = suffix
+                    script_words_to_remove = script_parts
+                    break
+            if script_suffix:
+                break
+
+    # Remove script name words from parts
+    if script_words_to_remove:
+        # Remove all occurrences of script words
+        for word in script_words_to_remove:
+            parts = [p for p in parts if p != word]
+
+    # Handle special multi-part name formats
+    # For "X TIMES Y" (Cuneiform) -> keep only first word
+    if "TIMES" in parts:
+        times_index = parts.index("TIMES")
+        parts = parts[:times_index]
+
+    # For Runic multi-part names like "FEHU FEOH FE F" -> keep shortest
+    # These have multiple space-separated uppercase single-letter variants
+    if script_suffix == "-ru" and len(parts) > 1:
+        # Find the shortest uppercase single-letter part
+        single_letters = [p for p in parts if len(p) == 1 and p.isupper()]
+        if single_letters:
+            parts = [single_letters[0]]
+        else:
+            # Keep the shortest part
+            parts = [min(parts, key=len)]
 
     # Remove category words
     parts = [p for p in parts if p not in DROP_CATEGORIES]
@@ -119,27 +232,31 @@ def glyph_data_for_unicode(decimal_unicode):
         return f"uni{decimal_unicode:04X}"
 
     # Convert to camelCase with proper casing
-    # For capital letters: First letter uppercase, rest lowercase
+    # For capital letters: First letter uppercase, rest lowercase (title case)
+    # Exception: Multi-letter acronyms (2-3 letter ligatures like AE, OE, IJ)
+    #            keep all uppercase
     # For small letters: All lowercase in first word
-    # For multi-letter acronyms (AE, OE, IJ): keep all uppercase
     # Subsequent words are always title case
 
     first_part = parts[0]
 
-    # Check if first part is a multi-letter acronym
+    # Check if first part is a multi-letter acronym/ligature
     # These are ligatures composed of single letters (AE, OE, IJ)
-    is_multi_letter_acronym = (
-        len(first_part) <= 3  # Short enough to be a ligature
+    # Criteria: 2-3 letters, all uppercase, is a capital letter, all alphabetic
+    is_multi_letter_ligature = (
+        len(first_part) in (2, 3)  # 2-3 letters only
         and first_part.isupper()  # All uppercase
         and is_capital  # Is a capital letter
         and all(c.isalpha() for c in first_part)  # Only letters
+        and script_suffix == "-lat"  # Only for Latin script
     )
 
-    if is_multi_letter_acronym:
-        # Keep as uppercase (e.g., AE, OE, IJ)
+    if is_multi_letter_ligature:
+        # Keep as uppercase for ligatures (e.g., AE, OE, IJ)
         glyph_name = first_part
     elif is_capital:
-        # Capital letter: First letter uppercase, rest lowercase
+        # Capital letter: Use title case (first upper, rest lower)
+        # Applies to all scripts: Latin, Cyrillic, Armenian, Georgian, etc.
         glyph_name = first_part.capitalize()
     else:
         # Small letter or no case indicator: all lowercase
