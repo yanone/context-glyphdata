@@ -192,9 +192,9 @@ TEST_CASES = [
     (0x0327, "cedillaCombining", "COMBINING CEDILLA"),
     (0x0328, "ogonekCombining", "COMBINING OGONEK"),
     # Combining marks - Arabic script
-    (0x064B, "fathatan-ar", "ARABIC FATHATAN"),
-    (0x064C, "dammatan-ar", "ARABIC DAMMATAN"),
-    (0x064D, "kasratan-ar", "ARABIC KASRATAN"),
+    (0x064B, "fathaTanween-ar", "ARABIC FATHATAN"),
+    (0x064C, "dammaTanween-ar", "ARABIC DAMMATAN"),
+    (0x064D, "kasraTanween-ar", "ARABIC KASRATAN"),
     (0x064E, "fatha-ar", "ARABIC FATHA"),
     (0x064F, "damma-ar", "ARABIC DAMMA"),
     (0x0650, "kasra-ar", "ARABIC KASRA"),

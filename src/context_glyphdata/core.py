@@ -279,6 +279,11 @@ def glyph_data_for_unicode(decimal_unicode):
     if is_combining:
         glyph_name += "Combining"
 
+    # Special handling for Arabic tanween marks
+    # Replace "tan" suffix with "Tanween" for fathatan, dammatan, kasratan
+    if script_suffix == "-ar" and glyph_name.endswith("tan"):
+        glyph_name = glyph_name[:-3] + "Tanween"
+
     # Add script suffix
     glyph_name += script_suffix
 
