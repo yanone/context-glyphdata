@@ -225,6 +225,16 @@ def glyph_data_for_unicode(decimal_unicode):
     connecting_words = {"WITH", "AND", "OR", "FOR", "TO", "OF", "THE"}
     parts = [p for p in parts if p not in connecting_words]
 
+    # Special handling for Latin combining marks
+    # For Latin script: "COMBINING GRAVE ACCENT" -> "gravecombining"
+    # (move "COMBINING" to the end, before script suffix)
+    is_combining = False
+    if "COMBINING" in name and not script_suffix:
+        # No script detected means it's a Latin/generic combining mark
+        is_combining = True
+        # Remove COMBINING from parts - it will be appended later
+        parts = [p for p in parts if p != "COMBINING"]
+
     if not parts:
         # If nothing left, use fallback
         return f"uni{decimal_unicode:04X}"
@@ -263,6 +273,11 @@ def glyph_data_for_unicode(decimal_unicode):
     # Add remaining parts in title case
     for part in parts[1:]:
         glyph_name += part.capitalize()
+
+    # For Latin combining marks, append "Combining" at the end
+    # (before script suffix)
+    if is_combining:
+        glyph_name += "Combining"
 
     # Add script suffix
     glyph_name += script_suffix
