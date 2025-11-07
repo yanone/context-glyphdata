@@ -250,10 +250,10 @@ TEST_CASES = [
     (0x03D5, "phiSymbol-gr", "GREEK PHI SYMBOL"),
     (0x03D6, "piSymbol-gr", "GREEK PI SYMBOL"),
     # Recently fixed duplicates - Hebrew ACCENT vs PUNCTUATION
-    (0x059C, "accentGeresh-heb", "HEBREW ACCENT GERESH"),
-    (0x05F3, "punctuationGeresh-heb", "HEBREW PUNCTUATION GERESH"),
-    (0x059D, "accentGereshMuqdam-heb", "HEBREW ACCENT GERESH MUQDAM"),
-    (0x05F4, "punctuationGershayim-heb", "HEBREW PUNCTUATION GERSHAYIM"),
+    (0x059C, "gereshAccent-heb", "HEBREW ACCENT GERESH"),
+    (0x05F3, "gereshPunctuation-heb", "HEBREW PUNCTUATION GERESH"),
+    (0x059D, "gereshMuqdamAccent-heb", "HEBREW ACCENT GERESH MUQDAM"),
+    (0x05F4, "gershayimPunctuation-heb", "HEBREW PUNCTUATION GERSHAYIM"),
     # Recently fixed duplicates - Arabic SMALL variants
     (0x0618, "smallFatha-ar", "ARABIC SMALL FATHA"),
     (0x0619, "smallDamma-ar", "ARABIC SMALL DAMMA"),

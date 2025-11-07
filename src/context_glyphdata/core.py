@@ -373,7 +373,7 @@ def glyph_data_for_unicode(decimal_unicode):
         # Otherwise keep all parts
 
     # Special handling for Latin combining marks
-    # For Latin script: "COMBINING GRAVE ACCENT" -> "gravecombining"
+    # For Latin script: "COMBINING GRAVE ACCENT" -> "graveCombining"
     # (move "COMBINING" to the end, before script suffix)
     is_combining = False
     if "COMBINING" in name and not script_suffix:
@@ -381,6 +381,18 @@ def glyph_data_for_unicode(decimal_unicode):
         is_combining = True
         # Remove COMBINING from parts - it will be appended later
         parts = [p for p in parts if p != "COMBINING"]
+
+    # Special handling for Hebrew accent and punctuation marks
+    # "HEBREW ACCENT GERESH" -> "gereshAccent-heb"
+    # "HEBREW PUNCTUATION GERESH" -> "gereshPunctuation-heb"
+    hebrew_suffix = ""
+    if script_suffix == "-heb":
+        if "ACCENT" in parts:
+            hebrew_suffix = "Accent"
+            parts = [p for p in parts if p != "ACCENT"]
+        elif "PUNCTUATION" in parts:
+            hebrew_suffix = "Punctuation"
+            parts = [p for p in parts if p != "PUNCTUATION"]
 
     if not parts:
         # If nothing left, use fallback
@@ -425,6 +437,11 @@ def glyph_data_for_unicode(decimal_unicode):
     # (before script suffix)
     if is_combining:
         glyph_name += "Combining"
+
+    # For Hebrew, append accent/punctuation type at the end
+    # (before script suffix)
+    if hebrew_suffix:
+        glyph_name += hebrew_suffix
 
     # For Hangul, append position indicator (before script suffix)
     if hangul_position:
