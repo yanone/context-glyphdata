@@ -26,6 +26,34 @@ from context_glyphdata.core import SCRIPT_SUFFIXES, DROP_CATEGORIES
 class TestScriptCoverage(unittest.TestCase):
     """Test that SCRIPT_SUFFIXES covers all commonly used scripts."""
 
+    def test_no_duplicate_script_suffixes(self):
+        """
+        Verify that no two scripts share the same suffix.
+
+        Each script must have a unique suffix to avoid ambiguity in glyph names.
+        """
+        suffix_to_scripts = {}
+        duplicates = {}
+
+        for script, suffix in SCRIPT_SUFFIXES.items():
+            if suffix in suffix_to_scripts:
+                # Found a duplicate
+                if suffix not in duplicates:
+                    duplicates[suffix] = [suffix_to_scripts[suffix]]
+                duplicates[suffix].append(script)
+            else:
+                suffix_to_scripts[suffix] = script
+
+        if duplicates:
+            msg_lines = ["\nDuplicate script suffixes detected:"]
+            for suffix, scripts in sorted(duplicates.items()):
+                msg_lines.append(f"  '{suffix}' used by: {', '.join(sorted(scripts))}")
+            msg_lines.append(
+                "\nEach script must have a unique suffix. "
+                "Please update SCRIPT_SUFFIXES."
+            )
+            self.fail("\n".join(msg_lines))
+
     def test_script_coverage_in_unicode_names(self):
         """
         Analyze Unicode character names to find potential missing scripts.
