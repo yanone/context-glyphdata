@@ -207,6 +207,10 @@ def glyph_data_for_unicode(decimal_unicode):
     # Remove hyphens before numbers (e.g., "TONE-1" -> "TONE 1")
     name = re.sub(r"-(\d)", r" \1", name)
 
+    # Replace hyphens in Hangul names
+    if "HANGUL" in name:
+        name = name.replace("-", " ")
+
     # Start processing the name
     parts = name.split()
 
