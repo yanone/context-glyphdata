@@ -8,7 +8,7 @@ and displays the top 1000 longest names in descending order
 along with their lengths.
 """
 
-from src.context_glyphdata.core import glyph_data_for_unicode
+from context_glyphdata.core import glyph_data_for_unicode
 import youseedee
 
 
