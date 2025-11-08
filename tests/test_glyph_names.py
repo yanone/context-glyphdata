@@ -260,6 +260,37 @@ TEST_CASES = [
     (0x0902, "anusvara-dev", "DEVANAGARI SIGN ANUSVARA"),
     (0x0903, "visarga-dev", "DEVANAGARI SIGN VISARGA"),
     #
+    # Punctuation marks from various scripts
+    # Latin punctuation
+    (0x002C, "comma", "COMMA"),
+    (0x002E, "fullStop", "FULL STOP"),
+    # Arabic punctuation
+    (0x060C, "comma-ar", "ARABIC COMMA"),
+    (0x061B, "semicolon-ar", "ARABIC SEMICOLON"),
+    (0x061F, "questionMark-ar", "ARABIC QUESTION MARK"),
+    # Devanagari punctuation
+    (0x0964, "danda-dev", "DEVANAGARI DANDA"),
+    (0x0965, "doubleDanda-dev", "DEVANAGARI DOUBLE DANDA"),
+    # Tibetan punctuation
+    (0x0F0D, "markShad-tib", "TIBETAN MARK SHAD"),
+    (0x0F0E, "markNyisShad-tib", "TIBETAN MARK NYIS SHAD"),
+    # Myanmar punctuation
+    (0x104A, "littleSection-mya", "MYANMAR SIGN LITTLE SECTION"),
+    (0x104B, "section-mya", "MYANMAR SIGN SECTION"),
+    # Ethiopic punctuation
+    (0x1362, "fullStop-eth", "ETHIOPIC FULL STOP"),
+    (0x1363, "comma-eth", "ETHIOPIC COMMA"),
+    # Georgian punctuation
+    (0x10FB, "paragraph-geo", "GEORGIAN PARAGRAPH SEPARATOR"),
+    # Mongolian punctuation
+    (0x1800, "birga-mon", "MONGOLIAN BIRGA"),
+    (0x1802, "comma-mon", "MONGOLIAN COMMA"),
+    # CJK punctuation (no script suffix - ideographic)
+    (0x3001, "ideographicComma", "IDEOGRAPHIC COMMA"),
+    (0x3002, "ideographicFullStop", "IDEOGRAPHIC FULL STOP"),
+    (0x3008, "leftAngleBracket", "LEFT ANGLE BRACKET"),
+    (0x3009, "rightAngleBracket", "RIGHT ANGLE BRACKET"),
+    #
     # Symbols (no script)
     (0x0024, "dollarSign", "DOLLAR SIGN"),
     (0x0025, "percentSign", "PERCENT SIGN"),
