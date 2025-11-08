@@ -166,7 +166,7 @@ def glyph_data_for_unicode(decimal_unicode):
     name = name.replace("ISOLATED FORM", "ISOL")
     name = name.replace("INITIAL FORM", "INIT")
     name = name.replace("MEDIAL FORM", "MEDI")
-    name = name.replace("MEDIAL FORM", "MEDI")
+    name = name.replace("FINAL FORM", "FINA")
     name = name.replace("DIAGONAL", "DIAG")
     name = name.replace("MATHEMATICAL", "MATH")
 
@@ -199,6 +199,10 @@ def glyph_data_for_unicode(decimal_unicode):
     name = name.replace("VERTICAL-LINE-", "VERTICAL LINE ")
     name = name.replace("WEST-CREE", "WEST CREE")
     name = name.replace("WOODS-CREE", "WOODS CREE")
+    name = name.replace("LESS-THAN", "LESS THAN")
+    name = name.replace("GREATER-THAN", "GREATER THAN")
+    name = name.replace("HAND-", "HAND ")
+    name = name.replace("MOVEMENT-", "MOVEMENT ")
 
     # Remove hyphens before numbers (e.g., "TONE-1" -> "TONE 1")
     name = re.sub(r"-(\d)", r" \1", name)
