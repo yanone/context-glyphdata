@@ -1,5 +1,6 @@
 """Core functionality for generating glyph names from Unicode data."""
 
+import re
 import youseedee
 
 
@@ -167,6 +168,40 @@ def glyph_data_for_unicode(decimal_unicode):
     name = name.replace("MEDIAL FORM", "MEDI")
     name = name.replace("MEDIAL FORM", "MEDI")
     name = name.replace("DIAGONAL", "DIAG")
+    name = name.replace("MATHEMATICAL", "MATH")
+
+    # To remove hyphens
+    name = name.replace("SANS-SERIF", "SANS SERIF")
+    name = name.replace("-HEADED", " HEADED")
+    name = name.replace("ARABIC-INDIC", "ARABIC INDIC")
+    name = name.replace("-VAS", " VAS")
+    name = name.replace("-VAS", " VAS")
+    name = name.replace("AS-SALAATU", "AS SALAATU")
+    name = name.replace("WAS-SALAAM", "WAS SALAAM")
+    name = name.replace("AR-RAHMAN", "AR RAHMAN")
+    name = name.replace("AR-RAHMAH", "AR RAHMAH")
+    name = name.replace("AR-RAHEEM", "AR RAHEEM")
+    name = name.replace("AS-SALAAM", "AS SALAAM")
+    name = name.replace("DOUBLE-STRUCK", "DOUBLE STRUCK")
+    name = name.replace("EXTRA-", "EXTRA ")
+    name = name.replace("LEFT-TO-RIGHT", "LEFT TO RIGHT")
+    name = name.replace("RIGHT-TO-LEFT", "RIGHT TO LEFT")
+    name = name.replace("PHASE-A", "PHASE A")
+    name = name.replace("PHASE-B", "PHASE B")
+    name = name.replace("PHASE-C", "PHASE C")
+    name = name.replace("PHASE-D", "PHASE D")
+    name = name.replace("PHASE-E", "PHASE E")
+    name = name.replace("PHASE-F", "PHASE F")
+    name = name.replace("NIEUN-", "NIEUN ")
+    name = name.replace("ARAEA-", "ARAEA ")
+    name = name.replace("TIKEUT-", "TIKEUT ")
+    name = name.replace("TH-CREE", "TH CREE")
+    name = name.replace("VERTICAL-LINE-", "VERTICAL LINE ")
+    name = name.replace("WEST-CREE", "WEST CREE")
+    name = name.replace("WOODS-CREE", "WOODS CREE")
+
+    # Remove hyphens before numbers (e.g., "TONE-1" -> "TONE 1")
+    name = re.sub(r"-(\d)", r" \1", name)
 
     # Start processing the name
     parts = name.split()
