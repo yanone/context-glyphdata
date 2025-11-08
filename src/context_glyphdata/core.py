@@ -201,14 +201,26 @@ def glyph_data_for_unicode(decimal_unicode):
     name = name.replace("WOODS-CREE", "WOODS CREE")
     name = name.replace("LESS-THAN", "LESS THAN")
     name = name.replace("GREATER-THAN", "GREATER THAN")
+    name = name.replace("OPEN-", "OPEN ")
     name = name.replace("HAND-", "HAND ")
+    name = name.replace("-HAND", " HAND")
+    name = name.replace("-LIKE", " LIKE")
+    name = name.replace("-LIGHTED", " LIGHTED")
+    name = name.replace("THREE-D", "3D")
+    name = name.replace("-SHAPED", " SHAPED")
     name = name.replace("MOVEMENT-", "MOVEMENT ")
 
     # Remove hyphens before numbers (e.g., "TONE-1" -> "TONE 1")
     name = re.sub(r"-(\d)", r" \1", name)
 
-    # Replace hyphens in Hangul names
-    if "HANGUL" in name:
+    # Replace hyphens in some scripts
+    if (
+        "HANGUL" in name
+        or "CANADIAN" in name
+        or "SINHALA" in name
+        or "KHMER" in name
+        or "HENTAIGANA" in name
+    ):
         name = name.replace("-", " ")
 
     # Start processing the name
