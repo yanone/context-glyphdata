@@ -153,6 +153,21 @@ def glyph_data_for_unicode(decimal_unicode):
 
     name = ucd["Name"]
 
+    # Apply replacements to shorten long names before tokenization
+    # These replacements reduce the length of the longest glyph names
+    name = name.replace("BOX DRAWINGS", "BOX")
+    name = name.replace("MUSICAL SYMBOL", "MUSICAL")
+    name = name.replace("SIGNWRITING MOVEMENT", "SIGN MOVE")
+    name = name.replace("SIGNWRITING ROTATION", "SIGN ROT")
+    name = name.replace("SIGNWRITING HAND", "SIGN HAND")
+    name = name.replace("SIGNWRITING TRAVEL", "SIGN TRAVEL")
+    name = name.replace("BYZANTINE MUSICAL SYMBOL", "BYZ MUS SYM")
+    name = name.replace("ISOLATED FORM", "ISOL")
+    name = name.replace("INITIAL FORM", "INIT")
+    name = name.replace("MEDIAL FORM", "MEDI")
+    name = name.replace("MEDIAL FORM", "MEDI")
+    name = name.replace("DIAGONAL", "DIAG")
+
     # Start processing the name
     parts = name.split()
 
