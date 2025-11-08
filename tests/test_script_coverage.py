@@ -67,8 +67,11 @@ class TestScriptCoverage(unittest.TestCase):
         This test scans all Unicode codepoints and ensures that the
         transformation produces unique glyph names. Any duplicates indicate
         a problem with the transformation logic or missing script suffixes.
+        
+        Also checks that no glyph names contain underscores.
         """
         glyph_name_to_codepoints = defaultdict(list)
+        glyph_names_with_underscores = []
         total_chars = 0
 
         # Scan entire Unicode range (0x0000 to 0x10FFFF)
@@ -90,6 +93,12 @@ class TestScriptCoverage(unittest.TestCase):
                 if glyph_name:
                     glyph_name_to_codepoints[glyph_name].append((codepoint, name))
                     total_chars += 1
+                    
+                    # Check for underscores
+                    if "_" in glyph_name:
+                        glyph_names_with_underscores.append(
+                            (codepoint, name, glyph_name)
+                        )
 
             except Exception:
                 # Skip characters that cause errors
@@ -103,6 +112,33 @@ class TestScriptCoverage(unittest.TestCase):
         }
 
         print(f"Scanned {total_chars} named characters")
+
+        # Check for underscores first
+        if glyph_names_with_underscores:
+            msg_lines = [
+                f"\nFound {len(glyph_names_with_underscores)} glyph names "
+                "with underscores:",
+                "",
+            ]
+            
+            # Show first 20
+            for cp, unicode_name, glyph_name in glyph_names_with_underscores[:20]:
+                msg_lines.append(
+                    f"  U+{cp:04X} {unicode_name} -> '{glyph_name}'"
+                )
+            
+            if len(glyph_names_with_underscores) > 20:
+                msg_lines.append(
+                    f"  ... and {len(glyph_names_with_underscores) - 20} more"
+                )
+            
+            msg_lines.append("")
+            msg_lines.append(
+                "Glyph names must not contain underscores "
+                "(underscores have special meaning in font editing)."
+            )
+            
+            self.fail("\n".join(msg_lines))
 
         if duplicates:
             msg_lines = [
@@ -139,6 +175,7 @@ class TestScriptCoverage(unittest.TestCase):
             self.fail("\n".join(msg_lines))
         else:
             print(f"✓ All {total_chars} glyph names are unique")
+            print(f"✓ All {total_chars} glyph names are underscore-free")
 
     def test_script_coverage_in_unicode_names(self):
         """
