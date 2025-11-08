@@ -186,9 +186,9 @@ TEST_CASES = [
     (0x07CC, "i-nko", "NKO LETTER I"),
     #
     # American scripts - Cherokee
-    (0x13A0, "ACaseless-chr", "CHEROKEE LETTER A"),
-    (0x13A1, "ECaseless-chr", "CHEROKEE LETTER E"),
-    (0x13A2, "ICaseless-chr", "CHEROKEE LETTER I"),
+    (0x13A0, "A-chr", "CHEROKEE LETTER A"),
+    (0x13A1, "E-chr", "CHEROKEE LETTER E"),
+    (0x13A2, "I-chr", "CHEROKEE LETTER I"),
     #
     # Historical scripts - Georgian
     (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
@@ -336,21 +336,21 @@ TEST_CASES = [
     (0x10D0, "AnCaseless-geo", "GEORGIAN LETTER AN"),
     (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
     #
-    # Cherokee: LETTER vs SMALL LETTER (caseless add Caseless suffix)
+    # Cherokee: LETTER vs SMALL LETTER (no CAPITAL, no Caseless suffix)
     (0xAB70, "a-chr", "CHEROKEE SMALL LETTER A"),
-    (0x13A0, "ACaseless-chr", "CHEROKEE LETTER A"),
+    (0x13A0, "A-chr", "CHEROKEE LETTER A"),
     (0x13F9, "yi-chr", "CHEROKEE SMALL LETTER YI"),
-    (0x13F1, "YiCaseless-chr", "CHEROKEE LETTER YI"),
+    (0x13F1, "Yi-chr", "CHEROKEE LETTER YI"),
     #
-    # Limbu: LETTER vs SMALL LETTER (caseless add Caseless suffix)
+    # Limbu: LETTER vs SMALL LETTER (no CAPITAL, no Caseless suffix)
     (0x1930, "ka-limb", "LIMBU SMALL LETTER KA"),
-    (0x1901, "KaCaseless-limb", "LIMBU LETTER KA"),
+    (0x1901, "Ka-limb", "LIMBU LETTER KA"),
     (0x1931, "nga-limb", "LIMBU SMALL LETTER NGA"),
-    (0x1905, "NgaCaseless-limb", "LIMBU LETTER NGA"),
+    (0x1905, "Nga-limb", "LIMBU LETTER NGA"),
     #
-    # Phags-pa: LETTER vs SMALL LETTER (caseless add Caseless suffix)
+    # Phags-pa: LETTER vs SMALL LETTER (no CAPITAL, no Caseless suffix)
     (0xA856, "a-phag", "PHAGS-PA LETTER SMALL A"),
-    (0xA85D, "ACaseless-phag", "PHAGS-PA LETTER A"),
+    (0xA85D, "A-phag", "PHAGS-PA LETTER A"),
     #
     # Hiragana/Katakana: SMALL is size variant, not case (keep SMALL)
     (0x3041, "smallA-hira", "HIRAGANA LETTER SMALL A"),

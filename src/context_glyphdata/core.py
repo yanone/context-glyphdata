@@ -248,7 +248,7 @@ def glyph_data_for_unicode(decimal_unicode):
             parts_to_keep.add("SIGN")  # VOWEL vs VOWEL SIGN
         # Treat caseless letters as uppercase in scripts with case
         # e.g., "LATIN LETTER GLOTTAL STOP" -> "GlottalStopCaseless-lat"
-        # (when both CAPITAL and caseless variants exist)
+        # Only add "Caseless" suffix for scripts with CAPITAL variants
         # Scripts with case: Latin, Greek, Cyrillic, Georgian, Cherokee, Limbu, Phags-pa
         scripts_with_case = {
             "-lat",
@@ -261,6 +261,16 @@ def glyph_data_for_unicode(decimal_unicode):
             "-chr",
             "-limb",
             "-phag",
+        }
+        # Scripts that have CAPITAL variants (need Caseless suffix)
+        scripts_with_capitals = {
+            "-lat",
+            "-gr",
+            "-cyr",
+            "-geo",
+            "-glag",
+            "-cop",
+            "-arm",
         }
         has_case_indicator = "SMALL" in parts or "CAPITAL" in parts
 
@@ -275,8 +285,9 @@ def glyph_data_for_unicode(decimal_unicode):
             and script_suffix in scripts_with_case
         ):
             is_caseless_letter = True
-            # Add "Caseless" suffix to disambiguate from CAPITAL variant
-            caseless_suffix = "Caseless"
+            # Add "Caseless" suffix only for scripts with CAPITAL variants
+            if script_suffix in scripts_with_capitals:
+                caseless_suffix = "Caseless"
         # Keep SIGN for specific scripts
         scripts_with_sign = {"-tai"}  # TAI YO: LETTER vs SIGN
         if "SIGN" in parts and script_suffix in scripts_with_sign:
@@ -291,7 +302,9 @@ def glyph_data_for_unicode(decimal_unicode):
                 and script_suffix in scripts_with_case
             ):
                 is_caseless_letter = True
-                caseless_suffix = "Caseless"
+                # Add "Caseless" suffix only for scripts with CAPITAL variants
+                if script_suffix in scripts_with_capitals:
+                    caseless_suffix = "Caseless"
     else:
         # For non-script items, keep SIGN to disambiguate
         # e.g., "COLON" vs "COLON SIGN"
