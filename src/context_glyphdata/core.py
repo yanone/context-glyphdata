@@ -234,15 +234,18 @@ def glyph_data_for_unicode(decimal_unicode):
     if has_ideograph:
         parts_to_keep.add("IDEOGRAPH")
     # Note: SYLLABLE/SYLLABICS now extracted as suffix, not kept in parts
+    # Note: LETTER for caseless variants now extracted as suffix too
     # Keep MARK, LETTER, SIGN when they disambiguate
     if "MARK" in parts and "LETTER" not in parts:
         parts_to_keep.add("MARK")
+
+    # Track if LETTER should be moved to end (for caseless variants)
+    letter_suffix = ""
     if script_suffix:  # For script characters
         if "VOWEL" in parts:
             parts_to_keep.add("SIGN")  # VOWEL vs VOWEL SIGN
-        # Keep LETTER for letters without case indicators
-        # BUT only for scripts that have a case system
-        # e.g., "LATIN LETTER GLOTTAL STOP" vs "LATIN SMALL LETTER..."
+        # Move LETTER to end for caseless letters in scripts with case
+        # e.g., "LATIN LETTER GLOTTAL STOP" -> "glottalStopLetter-lat"
         # Scripts with case: Latin, Greek, Cyrillic, Georgian, Cherokee, Limbu, Phags-pa
         scripts_with_case = {
             "-lat",
@@ -259,7 +262,7 @@ def glyph_data_for_unicode(decimal_unicode):
         has_case_indicator = "SMALL" in parts or "CAPITAL" in parts
 
         # For Hiragana/Katakana, SMALL is part of letter name, not case
-        # So treat as if it has case indicator (to avoid keeping LETTER)
+        # So treat as if it has case indicator (to avoid moving LETTER)
         if script_suffix in {"-hira", "-kata"}:
             has_case_indicator = True
 
@@ -268,7 +271,7 @@ def glyph_data_for_unicode(decimal_unicode):
             and not has_case_indicator
             and script_suffix in scripts_with_case
         ):
-            parts_to_keep.add("LETTER")
+            letter_suffix = "Letter"
         # Keep SIGN for specific scripts
         scripts_with_sign = {"-tai"}  # TAI YO: LETTER vs SIGN
         if "SIGN" in parts and script_suffix in scripts_with_sign:
@@ -276,12 +279,13 @@ def glyph_data_for_unicode(decimal_unicode):
         if "MARK" in parts and ("LETTER" in name or "SIGN" in name):
             # e.g., SAMARITAN MARK IN vs SAMARITAN LETTER IN
             parts_to_keep.add("MARK")
+            # Also move LETTER to end for caseless marks
             if (
                 "LETTER" in parts
                 and not has_case_indicator
                 and script_suffix in scripts_with_case
             ):
-                parts_to_keep.add("LETTER")
+                letter_suffix = "Letter"
     else:
         # For non-script items, keep SIGN to disambiguate
         # e.g., "COLON" vs "COLON SIGN"
@@ -458,6 +462,11 @@ def glyph_data_for_unicode(decimal_unicode):
     # (before script suffix)
     if syllable_suffix:
         glyph_name += syllable_suffix
+
+    # For caseless letters, append letter type at the end
+    # (before script suffix)
+    if letter_suffix:
+        glyph_name += letter_suffix
 
     # For Hangul, append position indicator (before script suffix)
     if hangul_position:

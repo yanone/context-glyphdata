@@ -186,14 +186,14 @@ TEST_CASES = [
     (0x07CC, "i-nko", "NKO LETTER I"),
     #
     # American scripts - Cherokee
-    (0x13A0, "letterA-chr", "CHEROKEE LETTER A"),
-    (0x13A1, "letterE-chr", "CHEROKEE LETTER E"),
-    (0x13A2, "letterI-chr", "CHEROKEE LETTER I"),
+    (0x13A0, "aLetter-chr", "CHEROKEE LETTER A"),
+    (0x13A1, "eLetter-chr", "CHEROKEE LETTER E"),
+    (0x13A2, "iLetter-chr", "CHEROKEE LETTER I"),
     #
     # Historical scripts - Georgian
     (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
     (0x10A1, "Ban-geo", "GEORGIAN CAPITAL LETTER BAN"),
-    (0x10D0, "letterAn-geo", "GEORGIAN LETTER AN"),
+    (0x10D0, "anLetter-geo", "GEORGIAN LETTER AN"),
     #
     # Historical scripts - Glagolitic
     (0x2C00, "Azu-glag", "GLAGOLITIC CAPITAL LETTER AZU"),
@@ -323,34 +323,34 @@ TEST_CASES = [
     #
     # Recently fixed duplicates - Case-aware LETTER preservation
     #
-    # Latin: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    # Latin: LETTER vs SMALL LETTER (caseless variants move LETTER to end)
     (0x0242, "glottalStop-lat", "LATIN SMALL LETTER GLOTTAL STOP"),
-    (0x0294, "letterGlottalStop-lat", "LATIN LETTER GLOTTAL STOP"),
+    (0x0294, "glottalStopLetter-lat", "LATIN LETTER GLOTTAL STOP"),
     #
-    # Greek: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    # Greek: LETTER vs SMALL LETTER (caseless variants move LETTER to end)
     (0x03D9, "archaicKoppa-gr", "GREEK SMALL LETTER ARCHAIC KOPPA"),
-    (0x03D8, "letterArchaicKoppa-gr", "GREEK LETTER ARCHAIC KOPPA"),
+    (0x03D8, "archaicKoppaLetter-gr", "GREEK LETTER ARCHAIC KOPPA"),
     #
-    # Georgian: LETTER vs CAPITAL/SMALL (caseless variants keep LETTER)
+    # Georgian: LETTER vs CAPITAL/SMALL (caseless move LETTER to end)
     (0x2D00, "an-geo", "GEORGIAN SMALL LETTER AN"),
-    (0x10D0, "letterAn-geo", "GEORGIAN LETTER AN"),
+    (0x10D0, "anLetter-geo", "GEORGIAN LETTER AN"),
     (0x10A0, "An-geo", "GEORGIAN CAPITAL LETTER AN"),
     #
-    # Cherokee: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    # Cherokee: LETTER vs SMALL LETTER (caseless variants move LETTER to end)
     (0xAB70, "a-chr", "CHEROKEE SMALL LETTER A"),
-    (0x13A0, "letterA-chr", "CHEROKEE LETTER A"),
+    (0x13A0, "aLetter-chr", "CHEROKEE LETTER A"),
     (0x13F9, "yi-chr", "CHEROKEE SMALL LETTER YI"),
-    (0x13F1, "letterYi-chr", "CHEROKEE LETTER YI"),
+    (0x13F1, "yiLetter-chr", "CHEROKEE LETTER YI"),
     #
-    # Limbu: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    # Limbu: LETTER vs SMALL LETTER (caseless variants move LETTER to end)
     (0x1930, "ka-limb", "LIMBU SMALL LETTER KA"),
-    (0x1901, "letterKa-limb", "LIMBU LETTER KA"),
+    (0x1901, "kaLetter-limb", "LIMBU LETTER KA"),
     (0x1931, "nga-limb", "LIMBU SMALL LETTER NGA"),
-    (0x1905, "letterNga-limb", "LIMBU LETTER NGA"),
+    (0x1905, "ngaLetter-limb", "LIMBU LETTER NGA"),
     #
-    # Phags-pa: LETTER vs SMALL LETTER (caseless variants keep LETTER)
+    # Phags-pa: LETTER vs SMALL LETTER (caseless variants move LETTER to end)
     (0xA856, "a-phag", "PHAGS-PA LETTER SMALL A"),
-    (0xA85D, "letterA-phag", "PHAGS-PA LETTER A"),
+    (0xA85D, "aLetter-phag", "PHAGS-PA LETTER A"),
     #
     # Hiragana/Katakana: SMALL is size variant, not case (keep SMALL)
     (0x3041, "smallA-hira", "HIRAGANA LETTER SMALL A"),
