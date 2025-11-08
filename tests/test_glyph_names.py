@@ -313,12 +313,94 @@ TEST_CASES = [
     (0x11052, "numberOne-brah", "BRAHMI NUMBER ONE"),
     (0x11066, "digitZero-brah", "BRAHMI DIGIT ZERO"),
     #
+    # Digits from various scripts
+    # ASCII digits (DIGIT removed - not needed for disambiguation)
+    (0x0030, "zero", "DIGIT ZERO"),
+    (0x0031, "one", "DIGIT ONE"),
+    (0x0039, "nine", "DIGIT NINE"),
+    # Arabic-Indic digits (DIGIT and INDIC removed)
+    (0x0660, "zero-ar", "ARABIC-INDIC DIGIT ZERO"),
+    (0x0661, "one-ar", "ARABIC-INDIC DIGIT ONE"),
+    (0x0669, "nine-ar", "ARABIC-INDIC DIGIT NINE"),
+    # Extended Arabic-Indic digits (DIGIT and INDIC removed)
+    (0x06F0, "extendedArabicZero", "EXTENDED ARABIC-INDIC DIGIT ZERO"),
+    (0x06F5, "extendedArabicFive", "EXTENDED ARABIC-INDIC DIGIT FIVE"),
+    # Devanagari digits (DIGIT removed)
+    (0x0966, "zero-dev", "DEVANAGARI DIGIT ZERO"),
+    (0x0967, "one-dev", "DEVANAGARI DIGIT ONE"),
+    # Bengali digits (DIGIT removed)
+    (0x09E6, "zero-ben", "BENGALI DIGIT ZERO"),
+    (0x09E7, "one-ben", "BENGALI DIGIT ONE"),
+    # Gurmukhi digits (DIGIT removed)
+    (0x0A66, "zero-gur", "GURMUKHI DIGIT ZERO"),
+    (0x0A6F, "nine-gur", "GURMUKHI DIGIT NINE"),
+    # Gujarati digits (DIGIT removed)
+    (0x0AE6, "zero-guj", "GUJARATI DIGIT ZERO"),
+    (0x0AEA, "four-guj", "GUJARATI DIGIT FOUR"),
+    # Oriya digits (DIGIT removed)
+    (0x0B66, "zero-ori", "ORIYA DIGIT ZERO"),
+    (0x0B6F, "nine-ori", "ORIYA DIGIT NINE"),
+    # Tamil digits (DIGIT removed)
+    (0x0BE6, "zero-tam", "TAMIL DIGIT ZERO"),
+    (0x0BEF, "nine-tam", "TAMIL DIGIT NINE"),
+    # Telugu digits (DIGIT removed)
+    (0x0C66, "zero-tel", "TELUGU DIGIT ZERO"),
+    (0x0C6F, "nine-tel", "TELUGU DIGIT NINE"),
+    # Kannada digits (DIGIT removed)
+    (0x0CE6, "zero-kan", "KANNADA DIGIT ZERO"),
+    (0x0CEF, "nine-kan", "KANNADA DIGIT NINE"),
+    # Malayalam digits (DIGIT removed)
+    (0x0D66, "zero-mal", "MALAYALAM DIGIT ZERO"),
+    (0x0D6F, "nine-mal", "MALAYALAM DIGIT NINE"),
+    # Thai digits (DIGIT removed)
+    (0x0E50, "zero-th", "THAI DIGIT ZERO"),
+    (0x0E59, "nine-th", "THAI DIGIT NINE"),
+    # Lao digits (DIGIT removed)
+    (0x0ED0, "zero-lao", "LAO DIGIT ZERO"),
+    (0x0ED9, "nine-lao", "LAO DIGIT NINE"),
+    # Tibetan digits (DIGIT removed)
+    (0x0F20, "zero-tib", "TIBETAN DIGIT ZERO"),
+    (0x0F29, "nine-tib", "TIBETAN DIGIT NINE"),
+    # Myanmar digits (DIGIT removed)
+    (0x1040, "zero-mya", "MYANMAR DIGIT ZERO"),
+    (0x1049, "nine-mya", "MYANMAR DIGIT NINE"),
+    # Khmer digits (DIGIT removed)
+    (0x17E0, "zero-khm", "KHMER DIGIT ZERO"),
+    (0x17E9, "nine-khm", "KHMER DIGIT NINE"),
+    # Mongolian digits (DIGIT removed)
+    (0x1810, "zero-mon", "MONGOLIAN DIGIT ZERO"),
+    (0x1819, "nine-mon", "MONGOLIAN DIGIT NINE"),
+    # Limbu digits (DIGIT removed)
+    (0x1946, "zero-limb", "LIMBU DIGIT ZERO"),
+    (0x194F, "nine-limb", "LIMBU DIGIT NINE"),
+    # New Tai Lue digits (DIGIT removed)
+    (0x19D0, "zero-talu", "NEW TAI LUE DIGIT ZERO"),
+    (0x19D9, "nine-talu", "NEW TAI LUE DIGIT NINE"),
+    # Balinese digits (DIGIT removed)
+    (0x1B50, "zero-bali", "BALINESE DIGIT ZERO"),
+    (0x1B59, "nine-bali", "BALINESE DIGIT NINE"),
+    # Sundanese digits (DIGIT removed)
+    (0x1BB0, "zero-sund", "SUNDANESE DIGIT ZERO"),
+    (0x1BB9, "nine-sund", "SUNDANESE DIGIT NINE"),
+    # Ol Chiki digits (DIGIT removed)
+    (0x1C50, "zero-olck", "OL CHIKI DIGIT ZERO"),
+    (0x1C59, "nine-olck", "OL CHIKI DIGIT NINE"),
+    # Vai digits (DIGIT removed)
+    (0xA620, "zero-vai", "VAI DIGIT ZERO"),
+    (0xA629, "nine-vai", "VAI DIGIT NINE"),
+    # Saurashtra digits (DIGIT removed)
+    (0xA8D0, "zero-saur", "SAURASHTRA DIGIT ZERO"),
+    (0xA8D9, "nine-saur", "SAURASHTRA DIGIT NINE"),
+    # Meetei Mayek digits (DIGIT removed)
+    (0xABF0, "zero-mtei", "MEETEI MAYEK DIGIT ZERO"),
+    (0xABF9, "nine-mtei", "MEETEI MAYEK DIGIT NINE"),
+    #
     # Recently fixed duplicates - Logical operators (kept AND/OR)
     (0x2A53, "doubleLogicalAnd", "DOUBLE LOGICAL AND"),
     (0x2A54, "doubleLogicalOr", "DOUBLE LOGICAL OR"),
     #
-    # Recently fixed duplicates - Parenthesized variants
-    (0x2474, "parenthesizedDigitOne", "PARENTHESIZED DIGIT ONE"),
+    # Recently fixed duplicates - Parenthesized variants (DIGIT removed)
+    (0x2474, "parenthesizedOne", "PARENTHESIZED DIGIT ONE"),
     (0x3220, "parenthesizedIdeographOne", "PARENTHESIZED IDEOGRAPH ONE"),
     #
     # Recently fixed duplicates - Case-aware LETTER preservation

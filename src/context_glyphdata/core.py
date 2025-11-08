@@ -39,7 +39,9 @@ SCRIPT_SUFFIXES = {
     "KHMER": "-khm",
     "JAVANESE": "-java",
     "BALINESE": "-bali",
+    "SUNDANESE": "-sund",
     "CHAM": "-cham",
+    "NEW TAI LUE": "-talu",
     # Tibetan & Himalayan
     "TIBETAN": "-tib",
     "LEPCHA": "-lepc",
@@ -89,6 +91,8 @@ SCRIPT_SUFFIXES = {
     "MENDE": "-men",
     "MIAO": "-plrd",
     "SAURASHTRA": "-saur",
+    "OL CHIKI": "-olck",
+    "MEETEI MAYEK": "-mtei",
     "HENTAIGANA": "-hent",
     "MASARAM": "-gonm",
     "GUNJALA": "-gong",
@@ -119,6 +123,7 @@ DROP_CATEGORIES = {
     "IDEOGRAPH",
     "CHARACTER",
     "ACCENT",
+    "INDIC",  # Arabic-Indic digits
     # Script-specific descriptive words
     "SUNG",  # Lao: tone marking variations (keep TAM, drop SUNG)
     # Runic descriptive names - keep shortest form
@@ -281,6 +286,17 @@ def glyph_data_for_unicode(decimal_unicode):
     has_ideograph = "IDEOGRAPH" in parts
     has_syllable = "SYLLABLE" in parts or "SYLLABICS" in parts
 
+    # Scripts that have both NUMBER and DIGIT characters (need disambiguation)
+    scripts_with_number_and_digit = {
+        "-brah",  # Brahmi
+        "-cop",  # Coptic
+        "-khar",  # Kharoshthi
+        "-sinh",  # Sinhala
+        "-ahom",  # Ahom
+        "-wara",  # Warang Citi
+        "-bhai",  # Bhaiksuki
+    }
+
     # Remove category words (but keep some for disambiguation)
     parts_to_keep = set()
     if is_small_variant or is_small_capital or is_small_script_variant:
@@ -299,7 +315,9 @@ def glyph_data_for_unicode(decimal_unicode):
         parts_to_keep.add("RADICAL")
     if has_number:
         parts_to_keep.add("NUMBER")
-    if has_digit:
+    # Only keep DIGIT for scripts that have both NUMBER and DIGIT
+    # (to avoid conflicts like BRAHMI NUMBER ONE vs BRAHMI DIGIT ONE)
+    if has_digit and script_suffix in scripts_with_number_and_digit:
         parts_to_keep.add("DIGIT")
     if has_ideograph:
         parts_to_keep.add("IDEOGRAPH")
