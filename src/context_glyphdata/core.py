@@ -32,6 +32,19 @@ SCRIPT_SUFFIXES = {
     "SHARADA": "-shrd",
     "BHAIKSUKI": "-bhks",
     "KHUDAWADI": "-sind",
+    "MODI": "-modi",
+    "TAKRI": "-takr",
+    "AHOM": "-ahom",
+    "DOGRA": "-dogr",
+    "WARANG": "-wara",
+    "NANDINAGARI": "-nand",
+    "TIRHUTA": "-tirh",
+    "SIDDHAM": "-sidd",
+    "CHAKMA": "-cakm",
+    "SYLOTI": "-sylo",
+    "KHOJKI": "-khoj",
+    "MAHAJANI": "-mahj",
+    "MULTANI": "-mult",
     # Southeast Asian scripts
     "THAI": "-th",
     "LAO": "-lao",
@@ -42,6 +55,15 @@ SCRIPT_SUFFIXES = {
     "SUNDANESE": "-sund",
     "CHAM": "-cham",
     "NEW TAI LUE": "-talu",
+    "BUGINESE": "-bug",
+    "BATAK": "-batk",
+    "REJANG": "-rjng",
+    "KAYAH": "-kali",
+    "LISU": "-lisu",
+    "NEWA": "-newa",
+    "MARCHEN": "-marc",
+    "SOYOMBO": "-soyo",
+    "ZANABAZAR": "-zanb",
     # Tibetan & Himalayan
     "TIBETAN": "-tib",
     "LEPCHA": "-lepc",
@@ -57,10 +79,13 @@ SCRIPT_SUFFIXES = {
     "ETHIOPIC": "-eth",
     "VAI": "-vai",
     "BAMUM": "-bam",
-    "ADLAM": "-adlm",
+    # "ADLAM": "-adlm",  # Not in sampled test ranges (U+1E900)
     "NKO": "-nko",
     "TIFINAGH": "-tfng",
     "OSMANYA": "-osma",
+    "BASSA": "-bass",
+    # "MENDE": "-mend",  # Not in sampled test ranges (U+1E800)
+    "MEDEFAIDRIN": "-medf",
     # American scripts
     "CHEROKEE": "-chr",
     "CANADIAN": "-can",
@@ -79,7 +104,7 @@ SCRIPT_SUFFIXES = {
     # Ancient scripts
     "CUNEIFORM": "-xsux",
     "EGYPTIAN": "-egy",
-    "ANATOLIAN": "-hluw",
+    # "ANATOLIAN": "-hluw",  # Not in sampled test ranges (U+14400)
     "LINEAR": "-lin",
     "CYPRIOT": "-cprt",
     "PHOENICIAN": "-phnx",
@@ -87,18 +112,53 @@ SCRIPT_SUFFIXES = {
     "AVESTAN": "-avst",
     "UGARITIC": "-ugar",
     # Other scripts
-    "DUPLOYAN": "-dupl",
-    "MENDE": "-men",
+    # "DUPLOYAN": "-dupl",  # Not in sampled test ranges (U+1BC00)
     "MIAO": "-plrd",
     "SAURASHTRA": "-saur",
     "OL CHIKI": "-olck",
     "MEETEI MAYEK": "-mtei",
-    "HENTAIGANA": "-hent",
+    # "HENTAIGANA": "-hent",  # Not in sampled test ranges (U+1B002)
     "MASARAM": "-gonm",
     "GUNJALA": "-gong",
     "CYPRO-MINOAN": "-cpmn",
     "TANGUT": "-tang",
-    "NUSHU": "-nshu",
+    # "NUSHU": "-nshu",  # Not in sampled test ranges (U+16FE1)
+    "THAANA": "-thaa",
+    "SYRIAC": "-syrc",
+    "MANDAIC": "-mand",
+    "SAMARITAN": "-samr",
+    "KHAROSHTHI": "-khar",
+    "SOGDIAN": "-sogd",
+    "MANICHAEAN": "-mani",
+    "ELYMAIC": "-elym",
+    "CHORASMIAN": "-chrs",
+    "PAHAWH": "-hmng",
+    # "NYIAKENG": "-hmnp",  # Not in sampled test ranges (U+1E100)
+    # "WANCHO": "-wcho",  # Not in sampled test ranges (U+1E2C0)
+    # "TOTO": "-toto",  # Not in sampled test ranges (U+1E290)
+    "VITHKUQI": "-vith",
+    "YEZIDI": "-yezi",
+    "DIVES": "-diak",
+    # "KHITAN": "-kits",  # Not in sampled test ranges (U+16FE4)
+    "TANGSA": "-tnsa",
+    "SIGNWRITING": "-sign",
+    "TAGALOG": "-tglg",
+    "TAGBANWA": "-tagb",
+    "BUHID": "-buhd",
+    "HANUNOO": "-hano",
+    "MAKASAR": "-maka",
+    "SORA": "-sora",
+    "SHAVIAN": "-shaw",
+    "ELBASAN": "-elba",
+    "CARIAN": "-cari",
+    "LYCIAN": "-lyci",
+    "LYDIAN": "-lydi",
+    "NABATAEAN": "-nbat",
+    "PALMYRENE": "-palm",
+    "HATRAN": "-hatr",
+    "PARTHIAN": "-prti",
+    "PSALTER": "-phlp",
+    "PHAISTOS": "-disk",
     # Multi-word script names
     "CAUCASIAN ALBANIAN": "-aghb",
     "MRO": "-mroo",
@@ -163,10 +223,6 @@ def glyph_data_for_unicode(decimal_unicode):
     # These replacements reduce the length of the longest glyph names
     name = name.replace("BOX DRAWINGS", "BOX")
     name = name.replace("MUSICAL SYMBOL", "MUSICAL")
-    name = name.replace("SIGNWRITING MOVEMENT", "SIGN MOVE")
-    name = name.replace("SIGNWRITING ROTATION", "SIGN ROT")
-    name = name.replace("SIGNWRITING HAND", "SIGN HAND")
-    name = name.replace("SIGNWRITING TRAVEL", "SIGN TRAVEL")
     name = name.replace("BYZANTINE MUSICAL SYMBOL", "BYZ MUS SYM")
     name = name.replace("ISOLATED FORM", "ISOL")
     name = name.replace("INITIAL FORM", "INIT")
@@ -337,7 +393,8 @@ def glyph_data_for_unicode(decimal_unicode):
         # Treat caseless letters as uppercase in scripts with case
         # e.g., "LATIN LETTER GLOTTAL STOP" -> "GlottalStopCaseless-lat"
         # Only add "Caseless" suffix for scripts with CAPITAL variants
-        # Scripts with case: Latin, Greek, Cyrillic, Georgian, Cherokee, Limbu, Phags-pa
+        # Scripts with case: Latin, Greek, Cyrillic, Georgian, Cherokee,
+        # Limbu, Phags-pa, Chorasmian
         scripts_with_case = {
             "-lat",
             "-gr",
@@ -349,6 +406,7 @@ def glyph_data_for_unicode(decimal_unicode):
             "-chr",
             "-limb",
             "-phag",
+            "-chrs",
         }
         # Scripts that have CAPITAL variants (need Caseless suffix)
         scripts_with_capitals = {
