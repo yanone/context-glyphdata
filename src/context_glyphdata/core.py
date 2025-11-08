@@ -233,9 +233,7 @@ def glyph_data_for_unicode(decimal_unicode):
         parts_to_keep.add("DIGIT")
     if has_ideograph:
         parts_to_keep.add("IDEOGRAPH")
-    if has_syllable:
-        parts_to_keep.add("SYLLABLE")
-        parts_to_keep.add("SYLLABICS")  # Canadian syllabics
+    # Note: SYLLABLE/SYLLABICS now extracted as suffix, not kept in parts
     # Keep MARK, LETTER, SIGN when they disambiguate
     if "MARK" in parts and "LETTER" not in parts:
         parts_to_keep.add("MARK")
@@ -289,6 +287,19 @@ def glyph_data_for_unicode(decimal_unicode):
         # e.g., "COLON" vs "COLON SIGN"
         if "SIGN" in parts:
             parts_to_keep.add("SIGN")
+
+    # Special handling for syllable tokens - extract before filtering
+    # "YI SYLLABLE IT" -> "itSyllable-yi"
+    # "ETHIOPIC SYLLABLE HA" -> "haSyllable-eth"
+    # "CANADIAN SYLLABICS A" -> "aSyllabics-can"
+    syllable_suffix = ""
+    if "SYLLABLE" in parts:
+        syllable_suffix = "Syllable"
+        # SYLLABLE will be removed by DROP_CATEGORIES
+    elif "SYLLABICS" in parts:
+        syllable_suffix = "Syllabics"
+        # Remove SYLLABICS from parts (not in DROP_CATEGORIES)
+        parts = [p for p in parts if p != "SYLLABICS"]
 
     parts = [p for p in parts if p not in DROP_CATEGORIES or p in parts_to_keep]
 
@@ -442,6 +453,11 @@ def glyph_data_for_unicode(decimal_unicode):
     # (before script suffix)
     if hebrew_suffix:
         glyph_name += hebrew_suffix
+
+    # For syllables, append syllable/syllabics type at the end
+    # (before script suffix)
+    if syllable_suffix:
+        glyph_name += syllable_suffix
 
     # For Hangul, append position indicator (before script suffix)
     if hangul_position:
