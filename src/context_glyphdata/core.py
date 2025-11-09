@@ -231,7 +231,15 @@ def glyph_data_for_unicode(decimal_unicode):
     name = name.replace("DIAGONAL", "DIAG")
     name = name.replace("MATHEMATICAL", "MATH")
 
-    # To remove hyphens
+    # Arabic special cases
+    name = name.replace("FATHATAN", "FATHA TANWEEN")
+    name = name.replace("DAMMATAN", "DAMMA TANWEEN")
+    name = name.replace("KASRATAN", "KASRA TANWEEN")
+
+    # Remove hyphens in specific phrases:
+    # If all hyphens are removed by replacement,
+    # it will lead to duplicate names that I
+    # was unable to resolve, hence targeted replacements only
     name = name.replace("SANS-SERIF", "SANS SERIF")
     name = name.replace("-HEADED", " HEADED")
     name = name.replace("ARABIC-INDIC", "ARABIC INDIC")
@@ -652,11 +660,6 @@ def glyph_data_for_unicode(decimal_unicode):
     # For Hangul, append position indicator (before script suffix)
     if hangul_position:
         glyph_name += hangul_position
-
-    # Special handling for Arabic tanween marks
-    # Replace "tan" suffix with "Tanween" for fathatan, dammatan, kasratan
-    if script_suffix == "-ar" and glyph_name.endswith("tan"):
-        glyph_name = glyph_name[:-3] + "Tanween"
 
     # Add script suffix
     glyph_name += script_suffix
