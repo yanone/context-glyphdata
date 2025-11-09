@@ -99,7 +99,9 @@ Examples:
         render_command()
     elif args.command == "char":
         if not args.argument:
-            print("Error: 'char' command requires a character argument", file=sys.stderr)
+            print(
+                "Error: 'char' command requires a character argument", file=sys.stderr
+            )
             sys.exit(1)
         char_command(args.argument)
     else:

@@ -562,6 +562,16 @@ def glyph_data_for_unicode(decimal_unicode):
         # Remove COMBINING from parts - it will be appended later
         parts = [p for p in parts if p != "COMBINING"]
 
+    # Special handling for modifier letters
+    # "MODIFIER LETTER SMALL H" -> "smallHModifier"
+    # (move "MODIFIER" to the end, before script suffix)
+    is_modifier = False
+    if "MODIFIER" in name and not script_suffix:
+        # No script detected means it's a generic modifier letter
+        is_modifier = True
+        # Remove MODIFIER from parts - it will be appended later
+        parts = [p for p in parts if p != "MODIFIER"]
+
     # Special handling for Hebrew accent and punctuation marks
     # "HEBREW ACCENT GERESH" -> "gereshAccent-heb"
     # "HEBREW PUNCTUATION GERESH" -> "gereshPunctuation-heb"
@@ -618,6 +628,11 @@ def glyph_data_for_unicode(decimal_unicode):
     # (before script suffix)
     if is_combining:
         glyph_name += "Combining"
+
+    # For modifier letters, append "Modifier" at the end
+    # (before script suffix)
+    if is_modifier:
+        glyph_name += "Modifier"
 
     # For Hebrew, append accent/punctuation type at the end
     # (before script suffix)
